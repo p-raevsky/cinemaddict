@@ -8,8 +8,9 @@ import {createFilmsListTemplate} from './view/films-list.js';
 import {createShowMoreButtonTemplate} from './view/show-more-button.js';
 import {createTopFilmsListTemplate} from './view/top-rated-films-list.js';
 import {createMostCommentedFilmsListTemplate} from './view/most-commented-films-list.js';
-import {createDetailedFilmCardTemplate} from './view/detailed-film-card.js';
-import {createStatisticTemplate} from './view/statistic.js';
+// Временно закоментировал.
+// import {createDetailedFilmCardTemplate} from './view/detailed-film-card.js';
+// import {createStatisticTemplate} from './view/statistic.js';
 
 const FILM_COUNT = 5;
 const EXTRA_FILM_COUNT = 2;
