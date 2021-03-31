@@ -8,9 +8,8 @@ import {createFilmsListTemplate} from './view/films-list.js';
 import {createShowMoreButtonTemplate} from './view/show-more-button.js';
 import {createTopFilmsListTemplate} from './view/top-rated-films-list.js';
 import {createMostCommentedFilmsListTemplate} from './view/most-commented-films-list.js';
-// Временно закоментировал.
-// import {createDetailedFilmCardTemplate} from './view/detailed-film-card.js';
-// import {createStatisticTemplate} from './view/statistic.js';
+import {createDetailedFilmCardTemplate} from './view/detailed-film-card.js';
+import {createStatisticTemplate} from './view/statistic.js';
 
 const FILM_COUNT = 5;
 const EXTRA_FILM_COUNT = 2;
@@ -32,8 +31,8 @@ const renderFilmCards = (container, template, place, count) => {
 
 render(headerElement, createProfileTemplate(), 'beforeend');
 render(mainElement, createMenuTemplate(), 'beforeend');
-// Временно закоментировал.
-// render(mainElement, createStatisticTemplate(), 'beforeend');
+
+render(mainElement, createStatisticTemplate(), 'beforeend');
 render(mainElement, createSortingTemplate(), 'beforeend');
 render(mainElement, createFilmsTemplate(), 'beforeend');
 
@@ -58,5 +57,4 @@ const mostCommentedFilmsListContainer = films.querySelector('.films-list--commen
 renderFilmCards(mostCommentedFilmsListContainer, createFilmCardTemplate(), 'beforeend', EXTRA_FILM_COUNT);
 render(footerElement, createFooterStatisticTemplate(), 'beforeend');
 
-// Временно закоментировал.
-// render(bodyElement, createDetailedFilmCardTemplate(), 'beforeend');
+render(bodyElement, createDetailedFilmCardTemplate(), 'beforeend');
