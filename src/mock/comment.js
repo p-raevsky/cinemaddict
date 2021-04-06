@@ -1,15 +1,7 @@
-import dayjs from 'dayjs';
 import {
-  getRandomNumber,
-  getRandomNumbersArray,
-  getRandomArrayIndex,
-  getOneElementOfArray
+  getOneElementOfArray,
+  generateDate
 } from '../util.js';
-
-const COMMENTS_AMOUNT = 10;
-const MAX_DAYS = 365;
-const ONE = 1;
-const ZERO = 0;
 
 const emotions = [
   'smile',
@@ -42,16 +34,9 @@ const comments = [
   'In rutrum ac purus sit amet tempus.',
 ];
 
-const commentsIdArray = getRandomNumbersArray(ZERO, COMMENTS_AMOUNT);
-
-const generateDate = () => {
-  const daysGap = -getRandomNumber(ONE, MAX_DAYS);
-  return dayjs().add(daysGap, 'day').format('YYYY-MM-DD[T]HH:mm:ss');
-};
-
-export const generateComment = () => {
+export const generateComment = (id) => {
   return {
-    id: getRandomArrayIndex(commentsIdArray),
+    id,
     author: getOneElementOfArray(authors),
     comment: getOneElementOfArray(comments),
     date: generateDate(),

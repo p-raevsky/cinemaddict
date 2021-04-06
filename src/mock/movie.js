@@ -1,16 +1,13 @@
 import {
   getRandomNumber,
   getRandomNumbersArray,
-  getRandomArrayIndex,
   getOneElementOfArray,
   getRandomArray,
   generateDate
 } from '../util.js';
 
-const MOVIES_AMOUNT = 24;
+const MOVIES_AMOUNT = 20;
 const REGULAR_AMOUNT = 5;
-const ZERO = 0;
-const ONE = 1;
 const MAX_RATING = 10;
 const MIN_RUNTIME = 50;
 const MAX_RUNTIME = 180;
@@ -60,13 +57,13 @@ const actors = [
 ];
 
 const posters = [
-  'made-for-each-other',
-  'popeye-meets-sinbad',
-  'sagebrush-trail',
-  'santa-claus-conquers-the-martians',
-  'the-dance-of-life',
-  'the-great-flamarion',
-  'the-man-with-the-golden-arm',
+  'made-for-each-other.png',
+  'popeye-meets-sinbad.png',
+  'sagebrush-trail.jpg',
+  'santa-claus-conquers-the-martians.jpg',
+  'the-dance-of-life.jpg',
+  'the-great-flamarion.jpg',
+  'the-man-with-the-golden-arm.jpg',
 ];
 
 const titles = [
@@ -115,8 +112,7 @@ const descriptions = [
 const genres = [
   'Anime',
   'Fantasy',
-  'Gangster-Crime',
-  'Science Fiction',
+  'Sci-Fi',
   'Western',
   'Mystery',
   'Comedy',
@@ -125,8 +121,6 @@ const genres = [
   'Horror',
   'Drama',
 ];
-
-const moviesIdArray = getRandomNumbersArray(ZERO, MOVIES_AMOUNT);
 
 const generateRuntime = () => {
   const time = getRandomNumber(MIN_RUNTIME, MAX_RUNTIME);
@@ -139,23 +133,19 @@ const generateRuntime = () => {
   }
 };
 
-// if (description.length > MAX_LENGTH) {
-//   alternativeTitle = `${description.substring(ZERO, MAX_LENGTH)}...`;
-// }
-
-export const generateMovie = () => {
+export const generateMovie = (id) => {
   const description = getRandomArray(descriptions, REGULAR_AMOUNT).join(' ');
-  const poster = `images/posters/${getOneElementOfArray(posters)}.jpg`;
+  const poster = `images/posters/${getOneElementOfArray(posters)}`;
   const title = getOneElementOfArray(titles);
-  const alternativeTitle = `Original: ${title}`;
+  const alternativeTitle = title;
 
   return {
-    id: getRandomArrayIndex(moviesIdArray),
-    comments: getRandomArray(getRandomNumbersArray(ZERO, REGULAR_AMOUNT), REGULAR_AMOUNT),
+    id,
+    comments: getRandomArray(getRandomNumbersArray(0, MOVIES_AMOUNT), REGULAR_AMOUNT),
     filmInfo: {
       title,
       alternativeTitle,
-      totalRating: getRandomNumber(ZERO, MAX_RATING, ONE),
+      totalRating: getRandomNumber(0, MAX_RATING, 1),
       poster,
       ageRating: getOneElementOfArray(ageRatings),
       director: getOneElementOfArray(directors),
@@ -166,14 +156,14 @@ export const generateMovie = () => {
         releaseCountry: getOneElementOfArray(countrys),
       },
       runtime: generateRuntime(),
-      genre: getRandomArray(genres, REGULAR_AMOUNT),
+      genres: getRandomArray(genres, REGULAR_AMOUNT),
       description,
     },
     userDetails: {
-      watchlist: Boolean(getRandomNumber(ZERO, ONE)),
-      alreadyWatched: Boolean(getRandomNumber(ZERO, ONE)),
+      isWatchlist: Boolean(getRandomNumber(0, 1)),
+      isAlreadyWatched: Boolean(getRandomNumber(0, 1)),
       watchingDate: generateDate(),
-      favorite: Boolean(getRandomNumber(ZERO, ONE)),
+      isFavorite: Boolean(getRandomNumber(0, 1)),
     },
   };
 };
