@@ -1,16 +1,20 @@
+const NOVICE_USER_NAME = 'Novice';
+const FAN_USER_NAME = 'Fan';
+const MOVIE_BUF_USER_NAME = 'Movie Buff';
+
 export const createProfileTemplate = (watchedMovies) => {
-  let userName = 'Novice';
+  let userName = NOVICE_USER_NAME;
   const moviesCount = watchedMovies.length;
 
   if (!watchedMovies) {
     return '';
   }
-  if (moviesCount > 10 && moviesCount <= 20) {
-    userName = 'Fan';
-  }
-  if (moviesCount > 20) {
-    userName = 'Movie buff';
-  }
+
+  moviesCount > 10 && moviesCount <= 20
+    ? userName = FAN_USER_NAME
+    : moviesCount > 20
+      ? userName = MOVIE_BUF_USER_NAME
+      : userName = NOVICE_USER_NAME;
 
   return `<section class="header__profile profile">
     <p class="profile__rating">${userName}</p>

@@ -17,9 +17,9 @@ import {generateFilter} from './filter.js';
 
 const FILM_COUNT = 5;
 const EXTRA_FILM_COUNT = 2;
-const TOTAL_AMOUNT = 21;
-const MIN_STATISTIC = 100000;
-const MAX_STATISTIC = 150000;
+const TOTAL_MOVIE_COUNT = 30;
+const MIN_FILM_NUMBER = 100000;
+const MAX_FILM_NUMBER = 150000;
 const FILM_COUNT_PER_STEP = 5;
 
 const bodyElement = document.querySelector('body');
@@ -27,11 +27,12 @@ const headerElement = bodyElement.querySelector('.header');
 const mainElement = bodyElement.querySelector('.main');
 const footerElement = bodyElement.querySelector('.footer');
 
-const idArray = Array.from(Array(TOTAL_AMOUNT).keys());
+const idArray = Array.from(Array(TOTAL_MOVIE_COUNT).keys());
 const comments = idArray.map((id) => generateComment(id));
 const movies = idArray.map((id) => generateMovie(id));
 const alreadyWatchedMovies = movies.filter((movie) => movie.userDetails.isAlreadyWatched);
-const footerStatisticNumber = getRandomNumber(MIN_STATISTIC, MAX_STATISTIC);
+
+const footerStatisticNumber = getRandomNumber(MIN_FILM_NUMBER, MAX_FILM_NUMBER);
 const filters = generateFilter(movies);
 
 const render = (container, template, place) => {

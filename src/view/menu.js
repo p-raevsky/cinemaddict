@@ -1,10 +1,12 @@
+const ALL_MOVIES_FILTER = 'All movies';
+
 const createFilterItemTemplate = (filter, isActive) => {
   const {name, count} = filter;
 
   return `<a href="#${name.toLowerCase()}"
     class="main-navigation__item ${isActive ? 'main-navigation__item--active' : ''}">
-    ${name === 'All movies'
-    ? 'All movies'
+    ${name === ALL_MOVIES_FILTER
+    ? ALL_MOVIES_FILTER
     : `${name} <span class="main-navigation__item-count">${count} </span>`}
   </a>`;
 };
