@@ -1,7 +1,22 @@
+const SORT_TYPES = [
+  'Sort by default',
+  'Sort by date',
+  'Sort by rating',
+];
+
+const sortTypesTemplate = (sortItem, isActive) => {
+  return `<a href="#" class="sort__button ${isActive ? 'sort__button--active' : ''}">
+      ${sortItem}
+    </a>
+  </li>`;
+};
+
 export const createSortingTemplate = () => {
+  const createSortMenu = SORT_TYPES
+    .map((sortTemplate, index) => sortTypesTemplate(sortTemplate, index === 0))
+    .join('');
+
   return `<ul class="sort">
-    <li><a href="#" class="sort__button sort__button--active">Sort by default</a></li>
-    <li><a href="#" class="sort__button">Sort by date</a></li>
-    <li><a href="#" class="sort__button">Sort by rating</a></li>
+    ${createSortMenu}
   </ul>`;
 };

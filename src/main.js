@@ -6,8 +6,7 @@ import {createFilmCardTemplate} from './view/film-card.js';
 import {createFilmsTemplate} from './view/films.js';
 import {createFilmsListTemplate} from './view/films-list.js';
 import {createShowMoreButtonTemplate} from './view/show-more-button.js';
-import {createTopFilmsListTemplate} from './view/top-rated-films-list.js';
-import {createMostCommentedFilmsListTemplate} from './view/most-commented-films-list.js';
+import {createExtraFilmsListTemplate} from './view/extra-films-list.js';
 import {createDetailedFilmCardTemplate} from './view/detailed-film-card.js';
 import {createStatisticTemplate} from './view/statistic.js';
 import {generateMovie} from './mock/movie.js';
@@ -17,10 +16,11 @@ import {generateFilter} from './filter.js';
 
 const FILM_COUNT = 5;
 const EXTRA_FILM_COUNT = 2;
-const TOTAL_MOVIE_COUNT = 30;
+const TOTAL_MOVIE_COUNT = 23;
 const MIN_FILM_NUMBER = 100000;
 const MAX_FILM_NUMBER = 150000;
 const FILM_COUNT_PER_STEP = 5;
+const MOST_COMMENTED_TITLE = 'Most commented';
 
 const bodyElement = document.querySelector('body');
 const headerElement = bodyElement.querySelector('.header');
@@ -88,16 +88,15 @@ const renderShowMoreButton = () => {
 
 renderShowMoreButton();
 
-render(films, createTopFilmsListTemplate(), 'beforeend');
+for ( let i = 1; i <= EXTRA_FILM_COUNT; i++) {
+  i !== EXTRA_FILM_COUNT
+    ? render(films, createExtraFilmsListTemplate(), 'beforeend')
+    : render(films, createExtraFilmsListTemplate(MOST_COMMENTED_TITLE), 'beforeend');
+}
 
-const topFilmsListContainer = films.querySelector('.films-list--top .films-list__container');
+const extraListContainers = films.querySelectorAll('.films-list--extra .films-list__container');
+extraListContainers.forEach((list) => renderFilmCards(list, movies, 'beforeend', EXTRA_FILM_COUNT));
 
-renderFilmCards(topFilmsListContainer, movies, 'beforeend', EXTRA_FILM_COUNT);
-render(films, createMostCommentedFilmsListTemplate(), 'beforeend');
-
-const mostCommentedFilmsListContainer = films.querySelector('.films-list--comment .films-list__container');
-
-renderFilmCards(mostCommentedFilmsListContainer, movies, 'beforeend', EXTRA_FILM_COUNT);
 render(footerElement, createFooterStatisticTemplate(footerStatisticNumber), 'beforeend');
 
 render(bodyElement, createDetailedFilmCardTemplate(movies[0], comments), 'beforeend');

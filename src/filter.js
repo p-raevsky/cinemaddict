@@ -1,8 +1,15 @@
+export const FILTER = {
+  ALL_MOVIES: 'All movies',
+  WATHCLIST: 'Watchlist',
+  FAVOURITES: 'Favorites',
+  HISTORY: 'History',
+};
+
 const movieToFilterMap = {
-  'All movies': (movies) => movies,
-  'Watchlist': (movies) => movies.filter((movie) => movie.userDetails.isWatchlist).length,
-  'Favorites': (movies) => movies.filter((movie) => movie.userDetails.isFavorite).length,
-  'History': (movies) => movies.filter((movie) => movie.userDetails.isAlreadyWatched).length,
+  [FILTER.ALL_MOVIES]: (movies) => movies,
+  [FILTER.WATHCLIST]: (movies) => movies.filter((movie) => movie.userDetails.isWatchlist).length,
+  [FILTER.FAVOURITES]: (movies) => movies.filter((movie) => movie.userDetails.isFavorite).length,
+  [FILTER.HISTORY]: (movies) => movies.filter((movie) => movie.userDetails.isAlreadyWatched).length,
 };
 
 export const generateFilter = (movies) => {

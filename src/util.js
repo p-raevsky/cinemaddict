@@ -1,7 +1,5 @@
 import dayjs from 'dayjs';
 
-const MAX_DAYS = 10000;
-
 const getRandomNumber = (minNumber, maxNumber, float = 0) => {
   return +(Math.random() * (maxNumber - minNumber) + minNumber).toFixed(float);
 };
@@ -35,8 +33,8 @@ const  getRandomArray = (array, regAmount) => {
   return indexes.slice(0, amount).map((element) => array[element]);
 };
 
-const generateDate = () => {
-  const daysGap = -getRandomNumber(1, MAX_DAYS);
+const generateDate = (days) => {
+  const daysGap = -getRandomNumber(1, days);
   return dayjs().add(daysGap, 'day');
 };
 

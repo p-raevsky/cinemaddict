@@ -1,23 +1,27 @@
-const NOVICE_USER_NAME = 'Novice';
-const FAN_USER_NAME = 'Fan';
-const MOVIE_BUF_USER_NAME = 'Movie Buff';
+const RANK = {
+  NOVICE: 'Novice',
+  FAN: 'Fan',
+  MOVIE_BUF: 'Movie Buff',
+};
+
+const moviesToRankMap = {
+  [RANK.NOVICE]: (count) => count <= 10,
+  [RANK.FAN]: (count) => count <= 20 && count > 10,
+  [RANK.MOVIE_BUF]: (count) => count > 20,
+};
 
 export const createProfileTemplate = (watchedMovies) => {
-  let userName = NOVICE_USER_NAME;
-  const moviesCount = watchedMovies.length;
-
-  if (!watchedMovies) {
+  const watchedMoviesAmount = watchedMovies.length;
+  if (!watchedMoviesAmount) {
     return '';
   }
 
-  moviesCount > 10 && moviesCount <= 20
-    ? userName = FAN_USER_NAME
-    : moviesCount > 20
-      ? userName = MOVIE_BUF_USER_NAME
-      : userName = NOVICE_USER_NAME;
+  const [rankName] = Object.entries(moviesToRankMap)
+    .filter(([, rankCount]) => rankCount(watchedMoviesAmount))
+    .flat();
 
   return `<section class="header__profile profile">
-    <p class="profile__rating">${userName}</p>
+    <p class="profile__rating">${rankName}</p>
     <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
   </section>`;
 };

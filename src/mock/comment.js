@@ -3,14 +3,16 @@ import {
   generateDate
 } from '../util.js';
 
-const emotions = [
+const DAYS_GAP = 365;
+
+const EMOTIONS = [
   'smile',
   'sleeping',
   'puke',
   'angry',
 ];
 
-const authors = [
+const AUTHORS = [
   'Tom Gordon',
   'The Flying Tomato',
   'Andre Dawson',
@@ -23,7 +25,7 @@ const authors = [
   'Mr. Hockey',
 ];
 
-const comments = [
+const COMMENTS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
   'Fusce tristique felis at fermentum pharetra.',
@@ -37,9 +39,9 @@ const comments = [
 export const generateComment = (id) => {
   return {
     id,
-    author: getOneElementOfArray(authors),
-    comment: getOneElementOfArray(comments),
-    date: generateDate(),
-    emotion: getOneElementOfArray(emotions),
+    author: getOneElementOfArray(AUTHORS),
+    comment: getOneElementOfArray(COMMENTS),
+    date: generateDate(DAYS_GAP),
+    emotion: getOneElementOfArray(EMOTIONS),
   };
 };
