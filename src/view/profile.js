@@ -1,3 +1,5 @@
+import {createElement} from '../util.js';
+
 const RANK = {
   NOVICE: 'Novice',
   FAN: 'Fan',
@@ -10,8 +12,9 @@ const moviesToRankMap = {
   [RANK.MOVIE_BUF]: (count) => count > 20,
 };
 
-export const createProfileTemplate = (watchedMovies) => {
+const createProfileTemplate = (watchedMovies) => {
   const watchedMoviesAmount = watchedMovies.length;
+
   if (!watchedMoviesAmount) {
     return '';
   }
@@ -25,3 +28,26 @@ export const createProfileTemplate = (watchedMovies) => {
     <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
   </section>`;
 };
+
+export default class Profile {
+  constructor(movies) {
+    this._watchedMovies = movies;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createProfileTemplate(this._watchedMovies);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

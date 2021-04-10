@@ -1,3 +1,5 @@
+import {createElement} from '../util.js';
+
 const SORT_TYPES = [
   'Sort by default',
   'Sort by date',
@@ -11,7 +13,7 @@ const sortTypesTemplate = (sortItem, isActive) => {
   </li>`;
 };
 
-export const createSortingTemplate = () => {
+const createSortingTemplate = () => {
   const createSortMenu = SORT_TYPES
     .map((sortTemplate, index) => sortTypesTemplate(sortTemplate, index === 0))
     .join('');
@@ -20,3 +22,25 @@ export const createSortingTemplate = () => {
     ${createSortMenu}
   </ul>`;
 };
+
+export default class Sorting {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createSortingTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

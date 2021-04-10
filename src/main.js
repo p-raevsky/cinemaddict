@@ -1,13 +1,13 @@
 import SiteMenuView from './view/menu.js';
-import {createProfileTemplate} from './view/profile.js';
-import {createSortingTemplate} from './view/sorting.js';
+import ProfileView from './view/profile.js';
+import SortingView from './view/sorting.js';
 import {createFooterStatisticTemplate} from './view/footer-statistic.js';
 import {createFilmCardTemplate} from './view/film-card.js';
 import {createFilmsTemplate} from './view/films.js';
 import {createFilmsListTemplate} from './view/films-list.js';
 import {createShowMoreButtonTemplate} from './view/show-more-button.js';
 import {createExtraFilmsListTemplate} from './view/extra-films-list.js';
-import {createDetailedFilmCardTemplate} from './view/detailed-film-card.js';
+import DetailedFilmCardView from './view/detailed-film-card.js';
 import {createStatisticTemplate} from './view/statistic.js';
 import {generateMovie} from './mock/movie.js';
 import {generateComment} from './mock/comment.js';
@@ -46,11 +46,11 @@ const renderFilmCards = (container, moviesArray, place, count) => {
   }
 };
 
-renderTemplate(headerElement, createProfileTemplate(alreadyWatchedMovies), 'beforeend');
+renderElement(headerElement, new ProfileView(alreadyWatchedMovies).getElement(), RenderPosition.BEFOREEND);
 renderElement(mainElement, new SiteMenuView(filters).getElement(), RenderPosition.BEFOREEND);
 
 renderTemplate(mainElement, createStatisticTemplate(), 'beforeend');
-renderTemplate(mainElement, createSortingTemplate(), 'beforeend');
+renderElement(mainElement, new SortingView().getElement(), RenderPosition.BEFOREEND);
 renderTemplate(mainElement, createFilmsTemplate(), 'beforeend');
 
 const films = mainElement.querySelector('.films');
@@ -98,4 +98,4 @@ const extraListContainers = films.querySelectorAll('.films-list--extra .films-li
 extraListContainers.forEach((list) => renderFilmCards(list, movies, 'beforeend', EXTRA_FILM_COUNT));
 
 renderTemplate(footerElement, createFooterStatisticTemplate(footerStatisticNumber), 'beforeend');
-renderTemplate(bodyElement, createDetailedFilmCardTemplate(movies[0], comments), 'beforeend');
+renderElement(bodyElement, new DetailedFilmCardView(movies[0], comments).getElement(), RenderPosition.BEFOREEND);
