@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import {createElement} from '../util.js';
 
 const MAX_LENGTH = 140;
 
@@ -8,7 +9,7 @@ const isSelectedFilmControl = (isSomething) => {
     : '';
 };
 
-export const createFilmCardTemplate = (movie) => {
+const createFilmCardTemplate = (movie) => {
   const {comments, filmInfo, userDetails} = movie;
 
   const {
@@ -59,3 +60,26 @@ export const createFilmCardTemplate = (movie) => {
     </div>
   </article>`;
 };
+
+export default class FilmCard {
+  constructor(movie) {
+    this._movie = movie;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmCardTemplate(this._movie);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

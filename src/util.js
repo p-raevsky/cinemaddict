@@ -43,7 +43,7 @@ const generateDate = (days) => {
   return dayjs().add(daysGap, 'day');
 };
 
-const renderElement = (container, element, place) => {
+const render = (container, element, place) => {
   switch (place) {
     case RenderPosition.AFTERBEGIN:
       container.prepend(element);
@@ -52,10 +52,6 @@ const renderElement = (container, element, place) => {
       container.append(element);
       break;
   }
-};
-
-const renderTemplate = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
 };
 
 const createElement = (template) => {
@@ -73,7 +69,6 @@ export {
   getOneElementOfArray,
   getRandomArray,
   generateDate,
-  renderTemplate,
-  renderElement,
+  render,
   createElement
 };
