@@ -11,8 +11,11 @@ import {createDetailedFilmCardTemplate} from './view/detailed-film-card.js';
 import {createStatisticTemplate} from './view/statistic.js';
 import {generateMovie} from './mock/movie.js';
 import {generateComment} from './mock/comment.js';
-import {getRandomNumber} from './util.js';
 import {generateFilter} from './filter.js';
+import {
+  getRandomNumber,
+  renderTemplate
+} from './util.js';
 
 const FILM_COUNT = 5;
 const EXTRA_FILM_COUNT = 2;
@@ -35,27 +38,22 @@ const alreadyWatchedMovies = movies.filter((movie) => movie.userDetails.isAlread
 const footerStatisticNumber = getRandomNumber(MIN_FILM_NUMBER, MAX_FILM_NUMBER);
 const filters = generateFilter(movies);
 
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
-
 const renderFilmCards = (container, moviesArray, place, count) => {
   for (let i = 0; i < count; i++) {
-    const template = createFilmCardTemplate(moviesArray[i]);
-    container.insertAdjacentHTML(place, template);
+    renderTemplate(container, createFilmCardTemplate(moviesArray[i]), place);
   }
 };
 
-render(headerElement, createProfileTemplate(alreadyWatchedMovies), 'beforeend');
-render(mainElement, createMenuTemplate(filters), 'beforeend');
+renderTemplate(headerElement, createProfileTemplate(alreadyWatchedMovies), 'beforeend');
+renderTemplate(mainElement, createMenuTemplate(filters), 'beforeend');
 
-render(mainElement, createStatisticTemplate(), 'beforeend');
-render(mainElement, createSortingTemplate(), 'beforeend');
-render(mainElement, createFilmsTemplate(), 'beforeend');
+renderTemplate(mainElement, createStatisticTemplate(), 'beforeend');
+renderTemplate(mainElement, createSortingTemplate(), 'beforeend');
+renderTemplate(mainElement, createFilmsTemplate(), 'beforeend');
 
 const films = mainElement.querySelector('.films');
 
-render(films, createFilmsListTemplate(), 'beforeend');
+renderTemplate(films, createFilmsListTemplate(), 'beforeend');
 
 const filmsList = films.querySelector('.films-list');
 const filmsListContainer = filmsList.querySelector('.films-list__container');
@@ -66,7 +64,7 @@ const renderShowMoreButton = () => {
   if (movies.length > FILM_COUNT_PER_STEP) {
     let renderedFilmCount = FILM_COUNT_PER_STEP;
 
-    render(filmsList, createShowMoreButtonTemplate(), 'beforeend');
+    renderTemplate(filmsList, createShowMoreButtonTemplate(), 'beforeend');
 
     const showMoreButton = filmsList.querySelector('.films-list__show-more');
 
@@ -75,7 +73,7 @@ const renderShowMoreButton = () => {
 
       movies
         .slice(renderedFilmCount, renderedFilmCount + FILM_COUNT_PER_STEP)
-        .forEach((movie) => render(filmsListContainer, createFilmCardTemplate(movie), 'beforeend'));
+        .forEach((movie) => renderTemplate(filmsListContainer, createFilmCardTemplate(movie), 'beforeend'));
 
       renderedFilmCount += FILM_COUNT_PER_STEP;
 
@@ -90,13 +88,12 @@ renderShowMoreButton();
 
 for ( let i = 1; i <= EXTRA_FILM_COUNT; i++) {
   i !== EXTRA_FILM_COUNT
-    ? render(films, createExtraFilmsListTemplate(), 'beforeend')
-    : render(films, createExtraFilmsListTemplate(MOST_COMMENTED_TITLE), 'beforeend');
+    ? renderTemplate(films, createExtraFilmsListTemplate(), 'beforeend')
+    : renderTemplate(films, createExtraFilmsListTemplate(MOST_COMMENTED_TITLE), 'beforeend');
 }
 
 const extraListContainers = films.querySelectorAll('.films-list--extra .films-list__container');
 extraListContainers.forEach((list) => renderFilmCards(list, movies, 'beforeend', EXTRA_FILM_COUNT));
 
-render(footerElement, createFooterStatisticTemplate(footerStatisticNumber), 'beforeend');
-
-render(bodyElement, createDetailedFilmCardTemplate(movies[0], comments), 'beforeend');
+renderTemplate(footerElement, createFooterStatisticTemplate(footerStatisticNumber), 'beforeend');
+renderTemplate(bodyElement, createDetailedFilmCardTemplate(movies[0], comments), 'beforeend');

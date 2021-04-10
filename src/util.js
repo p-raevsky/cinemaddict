@@ -1,5 +1,10 @@
 import dayjs from 'dayjs';
 
+const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+};
+
 const getRandomNumber = (minNumber, maxNumber, float = 0) => {
   return +(Math.random() * (maxNumber - minNumber) + minNumber).toFixed(float);
 };
@@ -38,11 +43,35 @@ const generateDate = (days) => {
   return dayjs().add(daysGap, 'day');
 };
 
+const renderElement = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
+const renderTemplate = (container, template, place) => {
+  container.insertAdjacentHTML(place, template);
+};
+
+const createElement = (template) => {
+  const newElement = document.createElement('div'); // 1
+  newElement.innerHTML = template; // 2
+
+  return newElement.firstChild; // 3
+};
+
 export {
+  RenderPosition,
   getRandomNumber,
   getRandomNumbersArray,
   getRandomArrayIndex,
   getOneElementOfArray,
   getRandomArray,
-  generateDate
+  generateDate,
+  renderTemplate
 };
