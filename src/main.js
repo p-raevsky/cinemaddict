@@ -1,4 +1,4 @@
-import {createMenuTemplate} from './view/menu.js';
+import SiteMenuView from './view/menu.js';
 import {createProfileTemplate} from './view/profile.js';
 import {createSortingTemplate} from './view/sorting.js';
 import {createFooterStatisticTemplate} from './view/footer-statistic.js';
@@ -13,8 +13,10 @@ import {generateMovie} from './mock/movie.js';
 import {generateComment} from './mock/comment.js';
 import {generateFilter} from './filter.js';
 import {
+  RenderPosition,
   getRandomNumber,
-  renderTemplate
+  renderTemplate,
+  renderElement
 } from './util.js';
 
 const FILM_COUNT = 5;
@@ -45,7 +47,7 @@ const renderFilmCards = (container, moviesArray, place, count) => {
 };
 
 renderTemplate(headerElement, createProfileTemplate(alreadyWatchedMovies), 'beforeend');
-renderTemplate(mainElement, createMenuTemplate(filters), 'beforeend');
+renderElement(mainElement, new SiteMenuView(filters).getElement(), RenderPosition.BEFOREEND);
 
 renderTemplate(mainElement, createStatisticTemplate(), 'beforeend');
 renderTemplate(mainElement, createSortingTemplate(), 'beforeend');
