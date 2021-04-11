@@ -72,7 +72,7 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
   const alreadyWatchedChecked = isCheckedDetailedFilmControl(isAlreadyWatched);
   const favoriteChecked = isCheckedDetailedFilmControl(isFavorite);
 
-  const commentsCount = comments.length ? comments.length : '0';
+  const commentsCount = !comments.length ? '0' : comments.length;
   let commentFragment;
 
   if (comments.length) {
@@ -82,7 +82,7 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
     commentFragment = '';
   }
 
-  return `<section class="film-details visually-hidden">
+  return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
       <div class="film-details__top-container">
         <div class="film-details__close">
