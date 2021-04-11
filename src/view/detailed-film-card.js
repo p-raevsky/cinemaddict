@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import {createElement} from '../util.js';
 
 const createCommentTemplate = (commentData) => {
   const {
@@ -30,7 +31,7 @@ const isCheckedDetailedFilmControl = (isSomething) => {
     : '';
 };
 
-export const createDetailedFilmCardTemplate = (movie, commentsArray) => {
+const createDetailedFilmCardTemplate = (movie, commentsArray) => {
   const {comments, filmInfo, userDetails} = movie;
 
   const {
@@ -71,7 +72,7 @@ export const createDetailedFilmCardTemplate = (movie, commentsArray) => {
   const alreadyWatchedChecked = isCheckedDetailedFilmControl(isAlreadyWatched);
   const favoriteChecked = isCheckedDetailedFilmControl(isFavorite);
 
-  const commentsCount = comments.length ? comments.length : '0';
+  const commentsCount = !comments.length ? '0' : comments.length;
   let commentFragment;
 
   if (comments.length) {
@@ -81,7 +82,7 @@ export const createDetailedFilmCardTemplate = (movie, commentsArray) => {
     commentFragment = '';
   }
 
-  return `<section class="film-details visually-hidden">
+  return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
       <div class="film-details__top-container">
         <div class="film-details__close">
@@ -199,3 +200,27 @@ export const createDetailedFilmCardTemplate = (movie, commentsArray) => {
     </form>
   </section>`;
 };
+
+export default class DetailedFilmCard {
+  constructor(film, comments) {
+    this._film = film;
+    this._comments = comments;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createDetailedFilmCardTemplate(this._film, this._comments);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

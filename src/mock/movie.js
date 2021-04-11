@@ -6,13 +6,15 @@ import {
   generateDate
 } from '../util.js';
 
-const MOVIES_AMOUNT = 20;
+const MOVIES_AMOUNT = 24;
 const REGULAR_AMOUNT = 5;
 const MAX_RATING = 10;
 const MIN_RUNTIME = 50;
 const MAX_RUNTIME = 180;
+const RELEASE_DATE_GAP = 10000;
+const WATCHING_DATE_GAP = 365;
 
-const directors = [
+const DIRECTORS = [
   'Jon Favreau',
   'Tim Burton',
   'J. J. Abrams',
@@ -24,7 +26,7 @@ const directors = [
   'Steven Spielberg',
 ];
 
-const writers = [
+const WRITERS = [
   'Billy Wilder',
   'Ethan Coen',
   'Amy Holden Jones',
@@ -38,7 +40,7 @@ const writers = [
   'Stanley Kubrick',
 ];
 
-const actors = [
+const ACTORS = [
   'Harrison Ford',
   'Charlize Theron',
   'Gregory Peck',
@@ -56,7 +58,7 @@ const actors = [
   'Al Pacino',
 ];
 
-const posters = [
+const POSTERS = [
   'made-for-each-other.png',
   'popeye-meets-sinbad.png',
   'sagebrush-trail.jpg',
@@ -66,7 +68,7 @@ const posters = [
   'the-man-with-the-golden-arm.jpg',
 ];
 
-const titles = [
+const TITLES = [
   'Made for each other',
   'Popeye meets sinbad',
   'Sagebrush trail',
@@ -76,7 +78,7 @@ const titles = [
   'The man with the golden arm',
 ];
 
-const ageRatings = [
+const AGE_RATINGS = [
   '0+',
   '6+',
   '12+',
@@ -84,7 +86,7 @@ const ageRatings = [
   '18+',
 ];
 
-const countrys = [
+const COUNTRYS = [
   'France',
   'United States',
   'Spain',
@@ -95,7 +97,7 @@ const countrys = [
   'Canada',
 ];
 
-const descriptions = [
+const DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
   'Fusce tristique felis at fermentum pharetra.',
@@ -109,7 +111,7 @@ const descriptions = [
   'In rutrum ac purus sit amet tempus.',
 ];
 
-const genres = [
+const GENRES = [
   'Anime',
   'Fantasy',
   'Sci-Fi',
@@ -134,9 +136,9 @@ const generateRuntime = () => {
 };
 
 export const generateMovie = (id) => {
-  const description = getRandomArray(descriptions, REGULAR_AMOUNT).join(' ');
-  const poster = `images/posters/${getOneElementOfArray(posters)}`;
-  const title = getOneElementOfArray(titles);
+  const description = getRandomArray(DESCRIPTIONS, REGULAR_AMOUNT).join(' ');
+  const poster = `images/posters/${getOneElementOfArray(POSTERS)}`;
+  const title = getOneElementOfArray(TITLES);
   const alternativeTitle = title;
 
   return {
@@ -147,22 +149,22 @@ export const generateMovie = (id) => {
       alternativeTitle,
       totalRating: getRandomNumber(0, MAX_RATING, 1),
       poster,
-      ageRating: getOneElementOfArray(ageRatings),
-      director: getOneElementOfArray(directors),
-      writers: getRandomArray(writers, REGULAR_AMOUNT),
-      actors: getRandomArray(actors, REGULAR_AMOUNT),
+      ageRating: getOneElementOfArray(AGE_RATINGS),
+      director: getOneElementOfArray(DIRECTORS),
+      writers: getRandomArray(WRITERS, REGULAR_AMOUNT),
+      actors: getRandomArray(ACTORS, REGULAR_AMOUNT),
       release: {
-        date: generateDate(),
-        releaseCountry: getOneElementOfArray(countrys),
+        date: generateDate(RELEASE_DATE_GAP),
+        releaseCountry: getOneElementOfArray(COUNTRYS),
       },
       runtime: generateRuntime(),
-      genres: getRandomArray(genres, REGULAR_AMOUNT),
+      genres: getRandomArray(GENRES, REGULAR_AMOUNT),
       description,
     },
     userDetails: {
       isWatchlist: Boolean(getRandomNumber(0, 1)),
       isAlreadyWatched: Boolean(getRandomNumber(0, 1)),
-      watchingDate: generateDate(),
+      watchingDate: generateDate(WATCHING_DATE_GAP),
       isFavorite: Boolean(getRandomNumber(0, 1)),
     },
   };
