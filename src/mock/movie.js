@@ -2,9 +2,9 @@ import {
   getRandomNumber,
   getRandomNumbersArray,
   getOneElementOfArray,
-  getRandomArray,
-  generateDate
-} from '../util.js';
+  getRandomArray
+} from '../utils/common.js';
+import {generateDate} from '../utils/film-card-data.js';
 
 const MOVIES_AMOUNT = 24;
 const REGULAR_AMOUNT = 5;

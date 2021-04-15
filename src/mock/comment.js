@@ -1,7 +1,5 @@
-import {
-  getOneElementOfArray,
-  generateDate
-} from '../util.js';
+import {getOneElementOfArray} from '../utils/common.js';
+import {generateDate} from '../utils/film-card-data.js';
 
 const DAYS_GAP = 365;
 
