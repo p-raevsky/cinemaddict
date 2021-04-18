@@ -12,8 +12,9 @@ const moviesToRankMap = {
   [RANK.MOVIE_BUF]: (count) => count > 20,
 };
 
-const createProfileTemplate = (watchedMovies) => {
-  const watchedMoviesAmount = watchedMovies.length;
+const createProfileTemplate = (movies) => {
+  const alreadyWatchedMovies = movies.filter((movie) => movie.userDetails.isAlreadyWatched);
+  const watchedMoviesAmount = alreadyWatchedMovies.length;
 
   if (!watchedMoviesAmount) {
     return '';
