@@ -26,4 +26,4 @@ const statisticPresenter = new StatisticPresenter(mainElement);
 statisticPresenter.init();
 
 const movieListPresenter = new MovieListPresenter(mainElement);
-movieListPresenter.init(movies, footerStatisticNumber, comments, movies, movies);
+movieListPresenter.init(movies, footerStatisticNumber, comments);

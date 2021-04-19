@@ -1,11 +1,14 @@
 import {bodyElement, mainElement} from '../constant.js';
 import {render, remove}  from '../utils/render.js';
+import {updateItem} from '../utils/common.js';
+
 import FilmsContainerView from '../view/films-container.js';
 import FilmsListView from '../view/films-list.js';
 import ShowMoreButtonView from '../view/show-more-button.js';
 import ExtraFilmsListView from '../view/extra-films-list.js';
 import NoMovieView from '../view/no-movie.js';
 import SortingView from '../view/sorting.js';
+
 import FooterStatisticPresenter from '../presenter/footer-Statistic.js';
 import ProfilePresenter from '../presenter/profile.js';
 import MoviePresenter from '../presenter/movie.js';
@@ -36,10 +39,15 @@ export default class MovieList {
 
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
 
+    this._filmCardPresenter = {};
+    this._topRatedFilmCardPresenter = {};
+    this._mostCommentedFilmCardPresenter = {};
+
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
+    this._handleFilmCardChange = this._handleFilmCardChange.bind(this);
   }
 
-  init(movies, totalMovieCount, comments, sortedTopRatedMovies, sortedMostCommentedMovies) {
+  init(movies, totalMovieCount, comments) {
     this._movies = movies.slice();
     this._comments = comments.slice();
 
@@ -52,8 +60,15 @@ export default class MovieList {
 
     this._renderProfile(this._movies);
     this._renderSort();
-    this._renderGeneralMoviesList(sortedTopRatedMovies, sortedMostCommentedMovies);
+    this._renderGeneralMoviesList();
     this._renderFooterStatistic(totalMovieCount);
+  }
+
+  _handleFilmCardChange(updatedMovie) {
+    this._movies = updateItem(this._movies, updatedMovie);
+    this._filmCardPresenter[updatedMovie.id].init(updatedMovie);
+    this._topRatedFilmCardPresenter[updatedMovie.id].init(updatedMovie);
+    this._mostCommentedFilmCardPresenter[updatedMovie.id].init(updatedMovie);
   }
 
   _renderProfile(movies) {
@@ -73,12 +88,32 @@ export default class MovieList {
   _renderMovie(container, movie, comments) {
     const moviePresenter = new MoviePresenter(container);
     moviePresenter.init(movie, comments);
+
+    return moviePresenter;
   }
 
-  _renderMovies(movies, container, count, comments) {
+  _renderRegularMovieList(movies, container, count, comments) {
     for (let i = 0; i < count; i++) {
-      this._renderMovie(container, movies[i], comments);
+      const presenter = this._renderMovie(container, movies[i], comments);
+      this._filmCardPresenter[movies[i].id] = presenter;
     }
+  }
+
+  _clearMovieList() {
+    const presenters = [
+      ...Object.values(this._filmCardPresenter),
+      ...Object.values(this._topRatedFilmCardPresenter),
+      ...Object.values(this._mostCommentedFilmCardPresenter),
+    ];
+
+    presenters.forEach((presenter) => presenter.destroy());
+
+    this._filmCardPresenter = {};
+    this._topRatedFilmCardPresenter = {};
+    this._mostCommentedFilmCardPresenter = {};
+
+    this._renderedFilmCount = FILM_COUNT_PER_STEP;
+    remove(this._showMoreButtonComponent);
   }
 
   _renderNoMovies() {
@@ -97,7 +132,10 @@ export default class MovieList {
   _handleShowMoreButtonClick() {
     this._movies
       .slice(this._renderedFilmCount, this._renderedFilmCount + FILM_COUNT_PER_STEP)
-      .forEach((movie) => this._renderMovie(this._filmsListContainer, movie, this._comments));
+      .forEach((movie) => {
+        const presenter = this._renderMovie(this._filmsListContainer, movie, this._comments);
+        this._filmCardPresenter[movie.id] = presenter;
+      });
 
     this._renderedFilmCount += FILM_COUNT_PER_STEP;
 
@@ -106,28 +144,49 @@ export default class MovieList {
     }
   }
 
-  _renderTopRatedList(sortedMovies) {
+  _renderTopRatedList(movies) {
     render(this._filmsContainerComponent, this._extraFilmsListComponent);
     this._topRatedListContainer = this._extraFilmsListComponent.getElement().querySelector('.films-list--extra .films-list__container');
-    this._renderMovies(sortedMovies, this._topRatedListContainer, EXTRA_FILM_COUNT, this._comments);
+
+    movies
+      .filter((movie) => movie.filmInfo.totalRating)
+      .sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating)
+      .slice(0, EXTRA_FILM_COUNT)
+      .forEach((movie) => {
+        const presenter = this._renderMovie(this._topRatedListContainer, movie, this._comments);
+        this._topRatedFilmCardPresenter[movie.id] = presenter;
+      });
   }
 
-  _renderMostCommentedList(sortedMovies) {
+  _renderMostCommentedList(movies) {
+    const moviesWithComments = movies.filter((movie) => movie.comments.length > 0);
+
     this._extraMostCommentedFilmsListComponent = new ExtraFilmsListView(MOST_COMMENTED_TITLE);
     render(this._filmsContainerComponent, this._extraMostCommentedFilmsListComponent);
+
+    if (!moviesWithComments.length) {
+      return;
+    }
+
     this._mostCommentedContainer = this._extraMostCommentedFilmsListComponent.getElement().querySelector('.films-list--extra .films-list__container');
 
-    this._renderMovies(sortedMovies, this._mostCommentedContainer, EXTRA_FILM_COUNT, this._comments);
+    moviesWithComments
+      .sort((a, b) => b.comments.length - a.comments.length)
+      .slice(0, EXTRA_FILM_COUNT)
+      .forEach((movie) => {
+        const presenter = this._renderMovie(this._mostCommentedContainer, movie, this._comments);
+        this._mostCommentedFilmCardPresenter[movie.id] = presenter;
+      });
   }
 
-  _renderGeneralMoviesList(sortedTopRatedMovies, sortedMostCommentedMovies) {
+  _renderGeneralMoviesList() {
     render(mainElement, this._filmsContainerComponent);
     render(this._filmsContainerComponent, this._filmsListComponent);
 
     this._filmsListContainer = document.querySelector('.films-list__container');
-    this._renderMovies(this._movies, this._filmsListContainer, FILM_COUNT, this._comments);
+    this._renderRegularMovieList(this._movies, this._filmsListContainer, FILM_COUNT, this._comments);
     this._renderShowMoreButton();
-    this._renderTopRatedList(sortedTopRatedMovies);
-    this._renderMostCommentedList(sortedMostCommentedMovies);
+    this._renderTopRatedList(this._movies);
+    this._renderMostCommentedList(this._movies);
   }
 }

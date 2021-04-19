@@ -68,7 +68,8 @@ export default class Movie {
   }
 
   _handleCloseButtonClick() {
-    remove(this._detailedFilmCardComponent);
+    this._detailedFilmCardComponent.getElement().remove();
+    this._detailedFilmCardComponent = null;
     bodyElement.classList.remove('hide-overflow');
 
     document.removeEventListener('keydown', this._documentKeydownHandler);
@@ -82,7 +83,8 @@ export default class Movie {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
 
-      bodyElement.removeChild(this._detailedFilmCardComponent.getElement());
+      this._detailedFilmCardComponent.getElement().remove();
+      this._detailedFilmCardComponent = null;
       bodyElement.classList.remove('hide-overflow');
 
       document.removeEventListener('keydown', this._documentKeydownHandler);
@@ -91,6 +93,5 @@ export default class Movie {
 
   destroy() {
     remove(this._filmCardComponent);
-    remove(this._detailedFilmCardComponent);
   }
 }
