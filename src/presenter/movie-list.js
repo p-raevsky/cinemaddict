@@ -45,6 +45,7 @@ export default class MovieList {
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleFilmCardChange = this._handleFilmCardChange.bind(this);
+    this._handleModeChange = this._handleModeChange.bind(this);
   }
 
   init(movies, totalMovieCount, comments) {
@@ -66,9 +67,24 @@ export default class MovieList {
 
   _handleFilmCardChange(updatedMovie) {
     this._movies = updateItem(this._movies, updatedMovie);
-    this._filmCardPresenter[updatedMovie.id].init(updatedMovie);
-    this._topRatedFilmCardPresenter[updatedMovie.id].init(updatedMovie);
-    this._mostCommentedFilmCardPresenter[updatedMovie.id].init(updatedMovie);
+
+    if(this._filmCardPresenter[updatedMovie.id]) {
+      this._filmCardPresenter[updatedMovie.id].init(updatedMovie);
+    }
+
+    if (this._topRatedFilmCardPresenter[updatedMovie.id]) {
+      this._topRatedFilmCardPresenter[updatedMovie.id].init(updatedMovie);
+    }
+
+    if (this._mostCommentedFilmCardPresenter[updatedMovie.id]) {
+      this._mostCommentedFilmCardPresenter[updatedMovie.id].init(updatedMovie);
+    }
+  }
+
+  _handleModeChange() {
+    Object
+      .values(this._filmCardPresenter)
+      .forEach((presenter) => presenter.closePopup());
   }
 
   _renderProfile(movies) {
@@ -86,7 +102,7 @@ export default class MovieList {
   }
 
   _renderMovie(container, movie, comments) {
-    const moviePresenter = new MoviePresenter(container);
+    const moviePresenter = new MoviePresenter(container, this._handleFilmCardChange, this._handleModeChange);
     moviePresenter.init(movie, comments);
 
     return moviePresenter;
