@@ -1,7 +1,7 @@
 import FilmCardView from '../view/film-card.js';
 import DetailedFilmCardView from '../view/detailed-film-card.js';
 import {render, remove, replace}  from '../utils/render.js';
-import {bodyElement} from '../constant.js';
+import {bodyElement} from '../elements.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -24,6 +24,9 @@ export default class Movie {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleAddToWatchlistClick = this._handleAddToWatchlistClick.bind(this);
     this._handleWatchedClick = this._handleWatchedClick.bind(this);
+    this._handleAddToWatchlistInPopapClick = this._handleAddToWatchlistInPopapClick.bind(this);
+    this._handleFavoriteInPopapClick = this._handleFavoriteInPopapClick.bind(this);
+    this._handleWatchedInPopapClick = this._handleWatchedInPopapClick.bind(this);
   }
 
   init(movie, comments) {
@@ -55,10 +58,16 @@ export default class Movie {
   }
 
   _renderDetailedFilmCard(movie, comments) {
+    this._mode = Mode.POPUP;
+
     const prevDetailedFilmCardComponent = this._detailedFilmCardComponent;
 
     this._detailedFilmCardComponent = new DetailedFilmCardView(movie, comments);
+
     this._detailedFilmCardComponent.setCloseBtnClickHandler(this._handleCloseButtonClick);
+    this._detailedFilmCardComponent.setAddToWatchlistInPopapClickHandler(this._handleAddToWatchlistInPopapClick);
+    this._detailedFilmCardComponent.setFavoriteInPopapClickHandler(this._handleFavoriteInPopapClick);
+    this._detailedFilmCardComponent.setWatchedInPopapClickHandler(this._handleWatchedInPopapClick);
 
     if (prevDetailedFilmCardComponent === null) {
       render(bodyElement, this._detailedFilmCardComponent);
@@ -108,14 +117,12 @@ export default class Movie {
 
   _handleFilmCardClick() {
     this._renderDetailedFilmCard(this._movie, this._comments);
-    this._changeMode();
-    this._mode = Mode.EDITING;
   }
 
   _handleAddToWatchlistClick(){
     const movie = this._movie;
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isWatchlist: !movie.isWatchlist});
+    const newUserDetails = Object.assign({}, movie.userDetails, {isWatchlist: !movie.userDetails.isWatchlist});
     const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
 
     this._changeData(newMovie);
@@ -124,7 +131,7 @@ export default class Movie {
   _handleFavoriteClick() {
     const movie = this._movie;
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isFavorite: !movie.isFavorite});
+    const newUserDetails = Object.assign({}, movie.userDetails, {isFavorite: !movie.userDetails.isFavorite});
     const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
 
     this._changeData(newMovie);
@@ -133,10 +140,40 @@ export default class Movie {
   _handleWatchedClick() {
     const movie = this._movie;
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isAlreadyWatched: !movie.isAlreadyWatched});
+    const newUserDetails = Object.assign({}, movie.userDetails, {isAlreadyWatched: !movie.userDetails.isAlreadyWatched});
     const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
 
     this._changeData(newMovie);
+  }
+
+  _handleAddToWatchlistInPopapClick() {
+    const movie = this._movie;
+
+    const newUserDetails = Object.assign({}, movie.userDetails, {isWatchlist: !movie.userDetails.isWatchlist});
+    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+
+    this._changeData(newMovie);
+    this._renderDetailedFilmCard(newMovie, this._comments);
+  }
+
+  _handleFavoriteInPopapClick() {
+    const movie = this._movie;
+
+    const newUserDetails = Object.assign({}, movie.userDetails, {isFavorite: !movie.userDetails.isFavorite});
+    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+
+    this._changeData(newMovie);
+    this._renderDetailedFilmCard(newMovie, this._comments);
+  }
+
+  _handleWatchedInPopapClick() {
+    const movie = this._movie;
+
+    const newUserDetails = Object.assign({}, movie.userDetails, {isAlreadyWatched: !movie.userDetails.isAlreadyWatched});
+    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+
+    this._changeData(newMovie);
+    this._renderDetailedFilmCard(newMovie, this._comments);
   }
 
   destroy() {

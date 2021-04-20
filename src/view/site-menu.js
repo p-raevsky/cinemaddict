@@ -1,4 +1,4 @@
-import {FILTER} from '../filter.js';
+import {FILTER} from '../presenter/site-menu.js';
 import AbstractView from './abstract.js';
 
 const createFilterItemTemplate = (filter, isActive) => {

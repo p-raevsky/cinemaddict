@@ -1,4 +1,4 @@
-import {bodyElement, mainElement} from '../constant.js';
+import {bodyElement, mainElement} from '../elements.js';
 import {render, remove}  from '../utils/render.js';
 import {updateItem} from '../utils/common.js';
 
@@ -9,7 +9,8 @@ import ExtraFilmsListView from '../view/extra-films-list.js';
 import NoMovieView from '../view/no-movie.js';
 import SortingView from '../view/sorting.js';
 
-import FooterStatisticPresenter from '../presenter/footer-Statistic.js';
+import SiteMenuPresenter from '../presenter/site-menu.js';
+import FooterStatisticPresenter from './footer-statistic.js';
 import ProfilePresenter from '../presenter/profile.js';
 import MoviePresenter from '../presenter/movie.js';
 
@@ -52,6 +53,8 @@ export default class MovieList {
     this._movies = movies.slice();
     this._comments = comments.slice();
 
+    this._renderSiteMenu(this._movies);
+
     if (!this._movies.length) {
       this._renderNoMovies();
       this._renderFooterStatistic(ZERO);
@@ -67,17 +70,16 @@ export default class MovieList {
 
   _handleFilmCardChange(updatedMovie) {
     this._movies = updateItem(this._movies, updatedMovie);
-
     if(this._filmCardPresenter[updatedMovie.id]) {
-      this._filmCardPresenter[updatedMovie.id].init(updatedMovie);
+      this._filmCardPresenter[updatedMovie.id].init(updatedMovie, this._comments);
     }
 
     if (this._topRatedFilmCardPresenter[updatedMovie.id]) {
-      this._topRatedFilmCardPresenter[updatedMovie.id].init(updatedMovie);
+      this._topRatedFilmCardPresenter[updatedMovie.id].init(updatedMovie, this._comments);
     }
 
     if (this._mostCommentedFilmCardPresenter[updatedMovie.id]) {
-      this._mostCommentedFilmCardPresenter[updatedMovie.id].init(updatedMovie);
+      this._mostCommentedFilmCardPresenter[updatedMovie.id].init(updatedMovie, this._comments);
     }
   }
 
@@ -85,6 +87,11 @@ export default class MovieList {
     Object
       .values(this._filmCardPresenter)
       .forEach((presenter) => presenter.closePopup());
+  }
+
+  _renderSiteMenu(movies) {
+    const siteMenuPresenter = new SiteMenuPresenter(mainElement);
+    siteMenuPresenter.init(movies);
   }
 
   _renderProfile(movies) {

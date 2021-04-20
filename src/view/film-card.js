@@ -3,15 +3,10 @@ import AbstractView from './abstract.js';
 
 const MAX_LENGTH = 140;
 
-const isSelectedFilmControl = (isSomething) => {
-  return isSomething
-    ? 'film-card__controls-item--active'
-    : '';
-};
+const isSelectedFilmControl = (isChecked) => isChecked ? 'film-card__controls-item--active' : '';
 
 const createFilmCardTemplate = (movie) => {
   const {comments, filmInfo, userDetails} = movie;
-
   const {
     description,
     genres,
