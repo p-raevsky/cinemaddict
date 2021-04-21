@@ -25,11 +25,7 @@ const createCommentTemplate = (commentData) => {
     </li>`;
 };
 
-const isCheckedDetailedFilmControl = (isSomething) => {
-  return isSomething
-    ? 'checked'
-    : '';
-};
+const isCheckedDetailedFilmControl = (isChecked) => isChecked ? 'checked' : '';
 
 const createDetailedFilmCardTemplate = (movie, commentsArray) => {
   const {comments, filmInfo, userDetails} = movie;
@@ -207,6 +203,9 @@ export default class DetailedFilmCard extends AbstractView {
     this._film = film;
     this._comments = comments;
     this._closeBtnClickHandler = this._closeBtnClickHandler.bind(this);
+    this._addToWatchlistInPopapClickHandler = this._addToWatchlistInPopapClickHandler.bind(this);
+    this._favoriteInPopapClickHandler = this._favoriteInPopapClickHandler.bind(this);
+    this._watchedInPopapClickHandler = this._watchedInPopapClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -218,8 +217,38 @@ export default class DetailedFilmCard extends AbstractView {
     this._callback.closeBtnClick();
   }
 
+  _favoriteInPopapClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteInPopapClick();
+  }
+
+  _addToWatchlistInPopapClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.addToWatchlistInPopapClick();
+  }
+
+  _watchedInPopapClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchedInPopapClick();
+  }
+
   setCloseBtnClickHandler(callback) {
     this._callback.closeBtnClick = callback;
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._closeBtnClickHandler);
+  }
+
+  setFavoriteInPopapClickHandler(callback) {
+    this._callback.favoriteInPopapClick = callback;
+    this.getElement().querySelector('#favorite').addEventListener('click', this._favoriteInPopapClickHandler);
+  }
+
+  setAddToWatchlistInPopapClickHandler(callback) {
+    this._callback.addToWatchlistInPopapClick = callback;
+    this.getElement().querySelector('#watchlist').addEventListener('click', this._addToWatchlistInPopapClickHandler);
+  }
+
+  setWatchedInPopapClickHandler(callback) {
+    this._callback.watchedInPopapClick = callback;
+    this.getElement().querySelector('#watched').addEventListener('click', this._watchedInPopapClickHandler);
   }
 }
