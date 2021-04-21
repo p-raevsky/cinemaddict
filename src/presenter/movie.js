@@ -30,6 +30,7 @@ export default class Movie {
   }
 
   init(movie, comments) {
+    this._mode = Mode.DEFAULT;
     this._movie = movie;
     this._comments = comments;
 
@@ -71,7 +72,6 @@ export default class Movie {
 
     if (prevDetailedFilmCardComponent === null) {
       render(bodyElement, this._detailedFilmCardComponent);
-
       bodyElement.classList.add('hide-overflow');
       document.addEventListener('keydown', this._documentKeydownHandler);
 
@@ -80,7 +80,6 @@ export default class Movie {
 
     if (this._mode === Mode.POPUP) {
       replace(this._detailedFilmCardComponent, prevDetailedFilmCardComponent);
-
       bodyElement.classList.add('hide-overflow');
       document.addEventListener('keydown', this._documentKeydownHandler);
     }
@@ -92,7 +91,6 @@ export default class Movie {
     if (this._mode !== Mode.DEFAULT) {
       this._detailedFilmCardComponent.getElement().remove();
       this._detailedFilmCardComponent = null;
-
       this._mode = Mode.DEFAULT;
     }
   }
@@ -100,7 +98,6 @@ export default class Movie {
   _documentKeydownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-
       this.closePopup();
       bodyElement.classList.remove('hide-overflow');
 

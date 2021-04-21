@@ -1,12 +1,6 @@
 import SiteMenuView from '../view/site-menu.js';
-import {render}  from '../utils/render.js';
-
-export const FILTER = {
-  ALL_MOVIES: 'All movies',
-  WATHCLIST: 'Watchlist',
-  FAVOURITES: 'Favorites',
-  HISTORY: 'History',
-};
+import {render} from '../utils/render.js';
+import {FILTER} from '../const.js';
 
 const movieToFilterMap = {
   [FILTER.ALL_MOVIES]: (movies) => movies,

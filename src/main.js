@@ -15,7 +15,6 @@ const idArray = Array.from(Array(TOTAL_MOVIE_COUNT).keys());
 const comments = idArray.map((id) => generateComment(id));
 const movies = idArray.map((id) => generateMovie(id));
 const footerStatisticNumber = getRandomNumber(MIN_FILM_NUMBER, MAX_FILM_NUMBER);
-
 const statisticPresenter = new StatisticPresenter(mainElement);
 statisticPresenter.init();
 
