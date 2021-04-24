@@ -295,10 +295,13 @@ export default class DetailedFilmCard extends Smart {
 
   _changeCommentEmojiHandler(evt) {
     evt.preventDefault();
+    const scrollPosition = document.querySelector('.film-details').scrollTop;
 
     this.updateData({
       newComment: Object.assign({}, this._data.newComment, {emoji: evt.target.value}),
     });
+
+    document.querySelector('.film-details').scrollTo(0, scrollPosition);
   }
 
   _closeBtnClickHandler(evt) {
