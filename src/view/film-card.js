@@ -3,6 +3,16 @@ import AbstractView from './abstract.js';
 
 const MAX_LENGTH = 140;
 
+const createMovieComments = (comments) => {
+  if (!comments.length) {
+    return '0 comments';
+  }
+
+  return comments.length >= 2
+    ? `${comments.length} comments`
+    : '1 comment';
+};
+
 const isSelectedFilmControl = (isChecked) => isChecked ? 'film-card__controls-item--active' : '';
 
 const createFilmCardTemplate = (movie) => {
@@ -29,9 +39,7 @@ const createFilmCardTemplate = (movie) => {
   const alternativeDescription = movieDescriptionLength > MAX_LENGTH
     ? `${description.substring(0, MAX_LENGTH - 1)}...`
     : description;
-  const movieComments = comments.length > 2
-    ? `${ comments.length} comments`
-    : '1 comment';
+  const movieComments = createMovieComments(comments);
 
   const watchlistActive = isSelectedFilmControl(isWatchlist);
   const alreadyWatchedtActive = isSelectedFilmControl(isAlreadyWatched);
