@@ -124,17 +124,6 @@ const GENRES = [
   'Drama',
 ];
 
-const generateRuntime = () => {
-  const time = getRandomNumber(MIN_RUNTIME, MAX_RUNTIME);
-
-  if (time < 60) {
-    return `${time}m`;
-  } else {
-    const h = parseInt(time / 60);
-    return `${h}h ${time - (h * 60)}m`;
-  }
-};
-
 export const generateMovie = (id) => {
   const description = getRandomArray(DESCRIPTIONS, REGULAR_AMOUNT).join(' ');
   const poster = `images/posters/${getOneElementOfArray(POSTERS)}`;
@@ -157,7 +146,7 @@ export const generateMovie = (id) => {
         date: generateDate(RELEASE_DATE_GAP),
         releaseCountry: getOneElementOfArray(COUNTRYS),
       },
-      runtime: generateRuntime(),
+      runtime: getRandomNumber(MIN_RUNTIME, MAX_RUNTIME),
       genres: getRandomArray(GENRES, REGULAR_AMOUNT),
       description,
     },

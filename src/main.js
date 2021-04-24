@@ -7,7 +7,7 @@ import MovieListPresenter from './presenter/movie-list.js';
 
 import {mainElement} from './elements';
 
-const TOTAL_MOVIE_COUNT = 24;
+const TOTAL_MOVIE_COUNT = 25;
 const MIN_FILM_NUMBER = 100000;
 const MAX_FILM_NUMBER = 150000;
 

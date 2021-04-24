@@ -24,15 +24,16 @@ export default class Movie {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleAddToWatchlistClick = this._handleAddToWatchlistClick.bind(this);
     this._handleWatchedClick = this._handleWatchedClick.bind(this);
-    this._handleAddToWatchlistInPopapClick = this._handleAddToWatchlistInPopapClick.bind(this);
-    this._handleFavoriteInPopapClick = this._handleFavoriteInPopapClick.bind(this);
-    this._handleWatchedInPopapClick = this._handleWatchedInPopapClick.bind(this);
+    this._handleAddToWatchlistInPopupClick = this._handleAddToWatchlistInPopupClick.bind(this);
+    this._handleFavoriteInPopupClick = this._handleFavoriteInPopupClick.bind(this);
+    this._handleWatchedInPopupClick = this._handleWatchedInPopupClick.bind(this);
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
   }
 
   init(movie, comments) {
     this._mode = Mode.DEFAULT;
     this._movie = movie;
-    this._comments = comments;
+    this._comments = this._getMovieComments(this._movie, comments);
 
     const prevFilmCardComponent = this._filmCardComponent;
 
@@ -58,6 +59,12 @@ export default class Movie {
     remove(prevFilmCardComponent);
   }
 
+  _getMovieComments(movie, commentsArray) {
+    const {comments} = movie;
+
+    return commentsArray.filter(({id}) => comments.includes(id));
+  }
+
   _renderDetailedFilmCard(movie, comments) {
     this._mode = Mode.POPUP;
 
@@ -66,9 +73,10 @@ export default class Movie {
     this._detailedFilmCardComponent = new DetailedFilmCardView(movie, comments);
 
     this._detailedFilmCardComponent.setCloseBtnClickHandler(this._handleCloseButtonClick);
-    this._detailedFilmCardComponent.setAddToWatchlistInPopapClickHandler(this._handleAddToWatchlistInPopapClick);
-    this._detailedFilmCardComponent.setFavoriteInPopapClickHandler(this._handleFavoriteInPopapClick);
-    this._detailedFilmCardComponent.setWatchedInPopapClickHandler(this._handleWatchedInPopapClick);
+    this._detailedFilmCardComponent.setAddToWatchlistInPopupClickHandler(this._handleAddToWatchlistInPopupClick);
+    this._detailedFilmCardComponent.setFavoriteInPopupClickHandler(this._handleFavoriteInPopupClick);
+    this._detailedFilmCardComponent.setWatchedInPopupClickHandler(this._handleWatchedInPopupClick);
+    this._detailedFilmCardComponent.setFormSubmitHandler(this._handleFormSubmit);
 
     if (prevDetailedFilmCardComponent === null) {
       render(bodyElement, this._detailedFilmCardComponent);
@@ -79,7 +87,10 @@ export default class Movie {
     }
 
     if (this._mode === Mode.POPUP) {
+      const scrollPosition = prevDetailedFilmCardComponent.getElement().scrollTop;
       replace(this._detailedFilmCardComponent, prevDetailedFilmCardComponent);
+      this._detailedFilmCardComponent.getElement().scrollTo(0, scrollPosition);
+
       bodyElement.classList.add('hide-overflow');
       document.addEventListener('keydown', this._documentKeydownHandler);
     }
@@ -143,7 +154,7 @@ export default class Movie {
     this._changeData(newMovie);
   }
 
-  _handleAddToWatchlistInPopapClick() {
+  _handleAddToWatchlistInPopupClick() {
     const movie = this._movie;
 
     const newUserDetails = Object.assign({}, movie.userDetails, {isWatchlist: !movie.userDetails.isWatchlist});
@@ -153,7 +164,7 @@ export default class Movie {
     this._renderDetailedFilmCard(newMovie, this._comments);
   }
 
-  _handleFavoriteInPopapClick() {
+  _handleFavoriteInPopupClick() {
     const movie = this._movie;
 
     const newUserDetails = Object.assign({}, movie.userDetails, {isFavorite: !movie.userDetails.isFavorite});
@@ -163,7 +174,7 @@ export default class Movie {
     this._renderDetailedFilmCard(newMovie, this._comments);
   }
 
-  _handleWatchedInPopapClick() {
+  _handleWatchedInPopupClick() {
     const movie = this._movie;
 
     const newUserDetails = Object.assign({}, movie.userDetails, {isAlreadyWatched: !movie.userDetails.isAlreadyWatched});
@@ -171,6 +182,9 @@ export default class Movie {
 
     this._changeData(newMovie);
     this._renderDetailedFilmCard(newMovie, this._comments);
+  }
+
+  _handleFormSubmit() {
   }
 
   destroy() {
