@@ -8,9 +8,9 @@ const createMovieComments = (comments) => {
     return '0 comments';
   }
 
-  return comments.length >= 2
+  return comments.length > 1
     ? `${comments.length} comments`
-    : '1 comment';
+    : `${comments.length} comment`;
 };
 
 const isSelectedFilmControl = (isChecked) => isChecked ? 'film-card__controls-item--active' : '';

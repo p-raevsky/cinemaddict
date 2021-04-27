@@ -3,7 +3,7 @@ import Smart from '../view/smart.js';
 
 const DEFAULT_NEW_COMMENT = {
   comment: '',
-  emoji: null,
+  emotion: null,
 };
 
 const createCommentTemplate = (commentData) => {
@@ -93,7 +93,7 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
   const alreadyWatchedChecked = isChecked(isAlreadyWatched);
   const favoriteChecked = isChecked(isFavorite);
 
-  const commentsCount = !comments.length ? '0' : comments.length;
+  const commentsCount = !commentsArray.length ? '0' : commentsArray.length;
 
   const commentsList = commentsArray
     .sort((a, b) => {
@@ -107,7 +107,7 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
     ? commentsList.map((comment) => createCommentTemplate(comment)).join('')
     : '';
 
-  const {emoji, comment} = newComment;
+  const {emotion, comment} = newComment;
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -195,7 +195,7 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
 
           <div class="film-details__new-comment">
             <div class="film-details__add-emoji-label">
-              ${emoji ? `<img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji-${emoji}">` : ''}
+              ${emotion ? `<img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">` : ''}
             </div>
 
             <label class="film-details__comment-label">
@@ -203,22 +203,22 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
             </label>
 
             <div class="film-details__emoji-list">
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile"${emoji === 'smile' ? ' checked' : ''}${isDisabled ? ' disabled' : ''}>
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile"${emotion === 'smile' ? ' checked' : ''}${isDisabled ? ' disabled' : ''}>
               <label class="film-details__emoji-label" for="emoji-smile">
                 <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
               </label>
 
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping"${emoji === 'sleeping' ? ' checked' : ''}${isDisabled ? ' disabled' : ''}>
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping"${emotion === 'sleeping' ? ' checked' : ''}${isDisabled ? ' disabled' : ''}>
               <label class="film-details__emoji-label" for="emoji-sleeping">
                 <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
               </label>
 
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke"${emoji === 'puke' ? ' checked' : ''}${isDisabled ? ' disabled' : ''}>
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke"${emotion === 'puke' ? ' checked' : ''}${isDisabled ? ' disabled' : ''}>
               <label class="film-details__emoji-label" for="emoji-puke">
                 <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
               </label>
 
-              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry"${emoji === 'angry' ? ' checked' : ''}${isDisabled ? ' disabled' : ''}>
+              <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry"${emotion === 'angry' ? ' checked' : ''}${isDisabled ? ' disabled' : ''}>
               <label class="film-details__emoji-label" for="emoji-angry">
                 <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
               </label>
@@ -235,11 +235,13 @@ export default class DetailedFilmCard extends Smart {
     super();
     this._data = DetailedFilmCard.parseFilmToData(film);
     this._comments = comments;
+    this._updatedComments = null;
     this._closeBtnClickHandler = this._closeBtnClickHandler.bind(this);
     this._addToWatchlistInPopupClickHandler = this._addToWatchlistInPopupClickHandler.bind(this);
     this._favoriteInPopupClickHandler = this._favoriteInPopupClickHandler.bind(this);
     this._watchedInPopupClickHandler = this._watchedInPopupClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._documentKeyDownHandler = this._documentKeyDownHandler.bind(this);
     this._changeCommentEmojiHandler = this._changeCommentEmojiHandler.bind(this);
     this._inputNewCommentHandler = this._inputNewCommentHandler.bind(this);
 
@@ -255,7 +257,10 @@ export default class DetailedFilmCard extends Smart {
 
   static parseDataToComment(data) {
     return {
-      comment: Object.assign({}, data.newComment),
+      comment: data.newComment.comment,
+      emotion: data.newComment.emotion,
+      date: dayjs().toDate(),
+      filmId: data.id,
     };
   }
 
@@ -293,17 +298,6 @@ export default class DetailedFilmCard extends Smart {
     this.restoreHandlers();
   }
 
-  _changeCommentEmojiHandler(evt) {
-    evt.preventDefault();
-    const scrollPosition = document.querySelector('.film-details').scrollTop;
-
-    this.updateData({
-      newComment: Object.assign({}, this._data.newComment, {emoji: evt.target.value}),
-    });
-
-    document.querySelector('.film-details').scrollTo(0, scrollPosition);
-  }
-
   _closeBtnClickHandler(evt) {
     evt.preventDefault();
     this._callback.closeBtnClick();
@@ -321,22 +315,28 @@ export default class DetailedFilmCard extends Smart {
 
   _watchedInPopupClickHandler(evt) {
     evt.preventDefault();
+
     this._callback.watchedInPopupClick();
   }
 
-  _formSubmitHandler(evt) {
-    evt.preventDefault();
-
+  _formSubmitHandler() {
     if (this._data.isDisabled) {
       return;
     }
 
-    const {comment, emoji} = this._data.newComment;
-    if (!comment || !emoji) {
+    const {comment, emotion} = this._data.newComment;
+    if (!comment.trim() || !emotion) {
       return;
     }
 
-    this._callback.formSubmit(DetailedFilmCard.parseDataToComment(this._data));
+    const update = DetailedFilmCard.parseDataToComment(this._data);
+
+    this.updateData({
+      newComment: Object.assign({}, this._data.newComment, DEFAULT_NEW_COMMENT),
+    }, true);
+
+    this._comments.push(update);
+    this.updateElement();
   }
 
   _documentKeyDownHandler(evt) {
@@ -344,6 +344,17 @@ export default class DetailedFilmCard extends Smart {
       evt.preventDefault();
       this._formSubmitHandler();
     }
+  }
+
+  _changeCommentEmojiHandler(evt) {
+    evt.preventDefault();
+    const scrollPosition = document.querySelector('.film-details').scrollTop;
+
+    this.updateData({
+      newComment: Object.assign({}, this._data.newComment, {emotion: evt.target.value}),
+    });
+
+    document.querySelector('.film-details').scrollTo(0, scrollPosition);
   }
 
   _inputNewCommentHandler(evt) {
