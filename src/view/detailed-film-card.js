@@ -236,6 +236,7 @@ export default class DetailedFilmCard extends Smart {
     this._data = DetailedFilmCard.parseFilmToData(film);
     this._comments = comments;
     this._updatedComments = null;
+    this._scrollPosition = null;
     this._closeBtnClickHandler = this._closeBtnClickHandler.bind(this);
     this._addToWatchlistInPopupClickHandler = this._addToWatchlistInPopupClickHandler.bind(this);
     this._favoriteInPopupClickHandler = this._favoriteInPopupClickHandler.bind(this);
@@ -336,7 +337,15 @@ export default class DetailedFilmCard extends Smart {
     }, true);
 
     this._comments.push(update);
+    const scrollPosition = document.querySelector('.film-details').scrollTop;
+
     this.updateElement();
+
+    if (scrollPosition) {
+      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
+      this._scrollPosition = this._scrollPosition + newCommentScroll;
+      document.querySelector('.film-details').scrollTo(0, this._scrollPosition);
+    }
   }
 
   _documentKeyDownHandler(evt) {
