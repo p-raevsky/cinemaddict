@@ -2,6 +2,7 @@ import {mainElement} from '../elements.js';
 import {render, remove}  from '../utils/render.js';
 import {sortMovieByDate, sortMovieByRating} from '../utils/film-card-data.js';
 import {SortTypes, UpdateType, UserAction} from '../const.js';
+import {movieToFilterMap} from '../utils/filter.js';
 
 import FilmsContainerView from '../view/films-container.js';
 import FilmsListView from '../view/films-list.js';
@@ -16,10 +17,11 @@ const EXTRA_FILM_COUNT = 2;
 const FILM_COUNT_PER_STEP = 5;
 const MOST_COMMENTED_TITLE = 'Most commented';
 export default class MovieList {
-  constructor(container, moviesModel, commentsModel) {
+  constructor(container, moviesModel, commentsModel, filterModel) {
     this._container = container;
     this._moviesModel = moviesModel;
     this._commentsModel = commentsModel;
+    this._filterModel = filterModel;
 
     this._noMovieComponent = new NoMovieView();
     this._filmsContainerComponent = new FilmsContainerView();
@@ -45,6 +47,7 @@ export default class MovieList {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._moviesModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -52,14 +55,18 @@ export default class MovieList {
   }
 
   _getMovies() {
+    const filterType = this._filterModel.getFilter();
+    const movies = this._moviesModel.getMovies().slice();
+    const filtredMovies = movieToFilterMap[filterType](movies);
+
     switch (this._currentSortType) {
       case SortTypes.DATE:
-        return this._moviesModel.getMovies().slice().sort(sortMovieByDate);
+        return filtredMovies.sort(sortMovieByDate);
       case SortTypes.RATING:
-        return this._moviesModel.getMovies().slice().sort(sortMovieByRating);
+        return filtredMovies.sort(sortMovieByRating);
     }
 
-    return this._moviesModel.getMovies();
+    return filtredMovies;
   }
 
   _getComments() {
@@ -74,21 +81,8 @@ export default class MovieList {
     }
   }
 
-  _handleModelEvent(updateType, data) {
+  _handleModelEvent(updateType) {
     switch (updateType) {
-      case UpdateType.PATCH:
-        if(this._filmCardPresenter[data.id]) {
-          this._filmCardPresenter[data.id].init(data, this._getComments());//вернуться к комментариям
-        }
-
-        if (this._topRatedFilmCardPresenter[data.id]) {
-          this._topRatedFilmCardPresenter[data.id].init(data, this._getComments());
-        }
-
-        if (this._mostCommentedFilmCardPresenter[data.id]) {
-          this._mostCommentedFilmCardPresenter[data.id].init(data, this._getComments());
-        }
-        break;
       case UpdateType.MINOR:
         this._clearMovieList();
         this._renderGeneralMoviesList();

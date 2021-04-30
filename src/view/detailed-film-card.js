@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import he from 'he';
+
 import Smart from '../view/smart.js';
 
 const DEFAULT_NEW_COMMENT = {
@@ -109,6 +111,8 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
 
   const {emotion, comment} = newComment;
 
+  const encodedComment = he.encode(comment);
+
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
       <div class="film-details__top-container">
@@ -199,7 +203,7 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
             </div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"${isDisabled ? ' disabled' : ''}>${comment ? comment : ''}</textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"${isDisabled ? ' disabled' : ''}>${encodedComment}</textarea>
             </label>
 
             <div class="film-details__emoji-list">

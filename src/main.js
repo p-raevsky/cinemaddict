@@ -11,7 +11,8 @@ import MovieListPresenter from './presenter/movie-list.js';
 import FooterStatisticPresenter from './presenter/footer-statistic.js';
 
 import MoviesModel from './model/movies.js';
-import CommentsModel from './model/comments';
+import CommentsModel from './model/comments.js';
+import FilterModel from './model/filter.js';
 
 const TOTAL_MOVIE_COUNT = 24;
 const MIN_FILM_NUMBER = 100000;
@@ -31,16 +32,18 @@ moviesModel.setMovies(movies);
 const commentsModel = new CommentsModel();
 commentsModel.setComments(comments);
 
+const filterModel = new FilterModel();
+
 const profilePresenter = new ProfilePresenter(headerElement, moviesModel);
 profilePresenter.init(movies);////убрать из инита в последствии
 
-const siteMenuPresenter = new SiteMenuPresenter(mainElement, moviesModel);
-siteMenuPresenter.init(movies);////убрать из инита в последствии
+const siteMenuPresenter = new SiteMenuPresenter(mainElement, filterModel, moviesModel);
+siteMenuPresenter.init();
 
 const statisticPresenter = new StatisticPresenter(mainElement, moviesModel);
 statisticPresenter.init();
 
-const movieListPresenter = new MovieListPresenter(mainElement, moviesModel, commentsModel);
+const movieListPresenter = new MovieListPresenter(mainElement, moviesModel, commentsModel, filterModel);
 movieListPresenter.init();
 
 const footerStatisticPresenter = new FooterStatisticPresenter(footerElement);
