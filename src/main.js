@@ -13,7 +13,7 @@ import FooterStatisticPresenter from './presenter/footer-statistic.js';
 import MoviesModel from './model/movies.js';
 import CommentsModel from './model/comments';
 
-const TOTAL_MOVIE_COUNT = 25;
+const TOTAL_MOVIE_COUNT = 24;
 const MIN_FILM_NUMBER = 100000;
 const MAX_FILM_NUMBER = 150000;
 
@@ -32,10 +32,10 @@ const commentsModel = new CommentsModel();
 commentsModel.setComments(comments);
 
 const profilePresenter = new ProfilePresenter(headerElement, moviesModel);
-profilePresenter.init();
+profilePresenter.init(movies);////убрать из инита в последствии
 
 const siteMenuPresenter = new SiteMenuPresenter(mainElement, moviesModel);
-siteMenuPresenter.init();
+siteMenuPresenter.init(movies);////убрать из инита в последствии
 
 const statisticPresenter = new StatisticPresenter(mainElement, moviesModel);
 statisticPresenter.init();

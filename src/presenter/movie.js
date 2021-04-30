@@ -2,6 +2,7 @@ import FilmCardView from '../view/film-card.js';
 import DetailedFilmCardView from '../view/detailed-film-card.js';
 import {render, remove, replace}  from '../utils/render.js';
 import {bodyElement} from '../elements.js';
+import {UserAction, UpdateType} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -133,7 +134,7 @@ export default class Movie {
     const newUserDetails = Object.assign({}, movie.userDetails, {isWatchlist: !movie.userDetails.isWatchlist});
     const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
 
-    this._changeData(newMovie);
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.PATCH, newMovie);
   }
 
   _handleFavoriteClick() {
@@ -142,7 +143,7 @@ export default class Movie {
     const newUserDetails = Object.assign({}, movie.userDetails, {isFavorite: !movie.userDetails.isFavorite});
     const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
 
-    this._changeData(newMovie);
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.PATCH, newMovie);
   }
 
   _handleWatchedClick() {
@@ -151,7 +152,7 @@ export default class Movie {
     const newUserDetails = Object.assign({}, movie.userDetails, {isAlreadyWatched: !movie.userDetails.isAlreadyWatched});
     const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
 
-    this._changeData(newMovie);
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.PATCH, newMovie);
   }
 
   _handleAddToWatchlistInPopupClick() {
@@ -160,7 +161,7 @@ export default class Movie {
     const newUserDetails = Object.assign({}, movie.userDetails, {isWatchlist: !movie.userDetails.isWatchlist});
     const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
 
-    this._changeData(newMovie);
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.PATCH, newMovie);
     this._renderDetailedFilmCard(newMovie, this._comments);
   }
 
@@ -170,7 +171,7 @@ export default class Movie {
     const newUserDetails = Object.assign({}, movie.userDetails, {isFavorite: !movie.userDetails.isFavorite});
     const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
 
-    this._changeData(newMovie);
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.PATCH, newMovie);
     this._renderDetailedFilmCard(newMovie, this._comments);
   }
 
@@ -180,11 +181,12 @@ export default class Movie {
     const newUserDetails = Object.assign({}, movie.userDetails, {isAlreadyWatched: !movie.userDetails.isAlreadyWatched});
     const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
 
-    this._changeData(newMovie);
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.PATCH, newMovie);
     this._renderDetailedFilmCard(newMovie, this._comments);
   }
 
-  _handleFormSubmit() {
+  _handleFormSubmit(comment) {
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, comment);// проверить!!!!!!!!
   }
 
   destroy() {
