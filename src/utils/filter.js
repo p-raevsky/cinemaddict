@@ -1,6 +1,6 @@
 import {FILTER} from '../const.js';
 
-export const movieToFilterMap = {
+export const filter = {
   [FILTER.ALL_MOVIES]: (movies) => movies,
   [FILTER.WATHCLIST]: (movies) => movies.filter((movie) => movie.userDetails.isWatchlist),
   [FILTER.FAVOURITES]: (movies) => movies.filter((movie) => movie.userDetails.isFavorite),

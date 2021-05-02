@@ -35,7 +35,7 @@ commentsModel.setComments(comments);
 const filterModel = new FilterModel();
 
 const profilePresenter = new ProfilePresenter(headerElement, moviesModel);
-profilePresenter.init(movies);////убрать из инита в последствии
+profilePresenter.init();
 
 const siteMenuPresenter = new SiteMenuPresenter(mainElement, filterModel, moviesModel);
 siteMenuPresenter.init();
@@ -46,5 +46,5 @@ statisticPresenter.init();
 const movieListPresenter = new MovieListPresenter(mainElement, moviesModel, commentsModel, filterModel);
 movieListPresenter.init();
 
-const footerStatisticPresenter = new FooterStatisticPresenter(footerElement);
-footerStatisticPresenter.init(totalMovieCount);
+const footerStatisticPresenter = new FooterStatisticPresenter(footerElement, moviesModel, totalMovieCount);
+footerStatisticPresenter.init();

@@ -1,6 +1,6 @@
 import SiteMenuView from '../view/site-menu.js';
 import {render, replace, remove} from '../utils/render.js';
-import {movieToFilterMap} from '../utils/filter.js';
+import {filter} from '../utils/filter.js';
 import {FILTER, UpdateType} from '../const.js';
 export default class SiteMenu {
   constructor(container, filterModel, moviesModel) {
@@ -53,22 +53,22 @@ export default class SiteMenu {
       {
         type: FILTER.ALL_MOVIES,
         name: 'All movies',
-        count: movieToFilterMap[FILTER.ALL_MOVIES](movies).length,
+        count: filter[FILTER.ALL_MOVIES](movies).length,
       },
       {
         type: FILTER.WATHCLIST,
         name: 'Watchlist',
-        count: movieToFilterMap[FILTER.WATHCLIST](movies).length,
+        count: filter[FILTER.WATHCLIST](movies).length,
       },
       {
         type: FILTER.FAVOURITES,
         name: 'Favorites',
-        count: movieToFilterMap[FILTER.FAVOURITES](movies).length,
+        count: filter[FILTER.FAVOURITES](movies).length,
       },
       {
         type: FILTER.HISTORY,
         name: 'History',
-        count: movieToFilterMap[FILTER.HISTORY](movies).length,
+        count: filter[FILTER.HISTORY](movies).length,
       },
     ];
   }

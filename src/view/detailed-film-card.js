@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import he from 'he';
-
+import {generateRuntime} from '../utils/film-card-data.js';
 import Smart from '../view/smart.js';
 
 const DEFAULT_NEW_COMMENT = {
@@ -14,6 +14,7 @@ const createCommentTemplate = (commentData) => {
     comment,
     date,
     emotion,
+    id,
   } = commentData;
 
   const commentDate = dayjs(date).format('YYYY/MM/DD HH:MM');
@@ -23,11 +24,11 @@ const createCommentTemplate = (commentData) => {
         <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-${emotion}">
       </span>
       <div>
-        <p class="film-details__comment-text">${comment}</p>
+        <p class="film-details__comment-text">${he.encode(comment)}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
           <span class="film-details__comment-day">${commentDate}</span>
-          <button type='button' class="film-details__comment-delete">
+          <button type='button' class="film-details__comment-delete" data-id="${id}">
             Delete
           </button>
         </p>
@@ -36,16 +37,6 @@ const createCommentTemplate = (commentData) => {
 };
 
 const isChecked = (isChecked) => isChecked ? 'checked' : '';
-
-const generateRuntime = (time) => {
-  if (time < 60) {
-    return `${time}m`;
-  }
-
-  const h = parseInt(time / 60);
-
-  return `${h}h ${time - (h * 60)}m`;
-};
 
 const createDetailedFilmCardTemplate = (movie, commentsArray) => {
   const {
@@ -110,8 +101,6 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
     : '';
 
   const {emotion, comment} = newComment;
-
-  const encodedComment = he.encode(comment);
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -203,7 +192,7 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
             </div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"${isDisabled ? ' disabled' : ''}>${encodedComment}</textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"${isDisabled ? ' disabled' : ''}>${he.encode(comment)}</textarea>
             </label>
 
             <div class="film-details__emoji-list">
@@ -249,6 +238,7 @@ export default class DetailedFilmCard extends Smart {
     this._documentKeyDownHandler = this._documentKeyDownHandler.bind(this);
     this._changeCommentEmojiHandler = this._changeCommentEmojiHandler.bind(this);
     this._inputNewCommentHandler = this._inputNewCommentHandler.bind(this);
+    this._deleteCommentHandler = this._deleteCommentHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -265,7 +255,7 @@ export default class DetailedFilmCard extends Smart {
       comment: data.newComment.comment,
       emotion: data.newComment.emotion,
       date: dayjs().toDate(),
-      filmId: data.id,
+      id: Date.now(),
     };
   }
 
@@ -320,7 +310,6 @@ export default class DetailedFilmCard extends Smart {
 
   _watchedInPopupClickHandler(evt) {
     evt.preventDefault();
-
     this._callback.watchedInPopupClick();
   }
 
@@ -335,21 +324,15 @@ export default class DetailedFilmCard extends Smart {
     }
 
     const update = DetailedFilmCard.parseDataToComment(this._data);
-
     this.updateData({
-      newComment: Object.assign({}, this._data.newComment, DEFAULT_NEW_COMMENT),
+      newComment: Object.assign(
+        {},
+        this._data.newComment,
+        DEFAULT_NEW_COMMENT,
+      ),
     }, true);
 
-    this._comments.push(update);
-    const scrollPosition = document.querySelector('.film-details').scrollTop;
-
-    this.updateElement();
-
-    if (scrollPosition) {
-      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
-      this._scrollPosition = this._scrollPosition + newCommentScroll;
-      document.querySelector('.film-details').scrollTo(0, this._scrollPosition);
-    }
+    this._callback.formSubmit(update);
   }
 
   _documentKeyDownHandler(evt) {
@@ -364,7 +347,13 @@ export default class DetailedFilmCard extends Smart {
     const scrollPosition = document.querySelector('.film-details').scrollTop;
 
     this.updateData({
-      newComment: Object.assign({}, this._data.newComment, {emotion: evt.target.value}),
+      newComment: Object.assign(
+        {},
+        this._data.newComment,
+        {
+          emotion: evt.target.value,
+        },
+      ),
     });
 
     document.querySelector('.film-details').scrollTo(0, scrollPosition);
@@ -373,8 +362,28 @@ export default class DetailedFilmCard extends Smart {
   _inputNewCommentHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      newComment: Object.assign({}, this._data.newComment, {comment: evt.target.value}),
+      newComment: Object.assign(
+        {},
+        this._data.newComment,
+        {
+          comment: evt.target.value,
+        },
+      ),
     }, true);
+  }
+
+  _deleteCommentHandler(evt) {
+    evt.preventDefault();
+    const deletedCommentId = +evt.target.dataset.id;
+    const [deletedComment] = this._comments.filter(({id}) => id === deletedCommentId);
+    this._callback.deleteComment(deletedComment);
+  }
+
+  setCommentDeleteHandler(callback) {
+    this._callback.deleteComment = callback;
+    this.getElement()
+      .querySelectorAll('.film-details__comment-delete')
+      .forEach((item) => item.addEventListener('click', this._deleteCommentHandler));
   }
 
   setFormSubmitHandler(callback) {
@@ -402,7 +411,6 @@ export default class DetailedFilmCard extends Smart {
     this.getElement().querySelector('#watched').addEventListener('click', this._watchedInPopupClickHandler);
   }
 
-
   restoreHandlers() {
     this._setInnerHandlers();
 
@@ -411,6 +419,7 @@ export default class DetailedFilmCard extends Smart {
     this.setWatchedInPopupClickHandler(this._callback.watchedInPopupClick);
     this.setCloseBtnClickHandler(this._callback.closeBtnClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setCommentDeleteHandler(this._callback.deleteComment);
   }
 
   _setInnerHandlers() {

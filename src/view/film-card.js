@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
+import {generateRuntime} from '../utils/film-card-data.js';
 
 const MAX_LENGTH = 140;
 
@@ -35,6 +36,7 @@ const createFilmCardTemplate = (movie) => {
 
   const movieGenre = genres[0];
   const releaseDate = dayjs(release.date).format('YYYY');
+  const movieRuntime = generateRuntime(runtime);
   const movieDescriptionLength = description.length;
   const alternativeDescription = movieDescriptionLength > MAX_LENGTH
     ? `${description.substring(0, MAX_LENGTH - 1)}...`
@@ -50,7 +52,7 @@ const createFilmCardTemplate = (movie) => {
     <p class="film-card__rating">${totalRating}</p>
     <p class="film-card__info">
       <span class="film-card__year">${releaseDate}</span>
-      <span class="film-card__duration">${runtime}</span>
+      <span class="film-card__duration">${movieRuntime}</span>
       <span class="film-card__genre">${movieGenre}</span>
     </p>
     <img src="./${poster}" alt="" class="film-card__poster">

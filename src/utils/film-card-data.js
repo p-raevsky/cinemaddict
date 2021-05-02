@@ -14,3 +14,13 @@ export const sortMovieByDate = (movieA, movieB) => {
 };
 
 export const sortMovieByRating = (movieA, movieB) => movieB.filmInfo.totalRating - movieA.filmInfo.totalRating;
+
+export const generateRuntime = (time) => {
+  if (time < 60) {
+    return `${time}m`;
+  }
+
+  const h = parseInt(time / 60);
+
+  return `${h}h ${time - (h * 60)}m`;
+};

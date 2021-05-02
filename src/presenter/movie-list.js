@@ -2,7 +2,7 @@ import {mainElement} from '../elements.js';
 import {render, remove}  from '../utils/render.js';
 import {sortMovieByDate, sortMovieByRating} from '../utils/film-card-data.js';
 import {SortTypes, UpdateType, UserAction} from '../const.js';
-import {movieToFilterMap} from '../utils/filter.js';
+import {filter} from '../utils/filter.js';
 
 import FilmsContainerView from '../view/films-container.js';
 import FilmsListView from '../view/films-list.js';
@@ -16,6 +16,7 @@ import MoviePresenter from '../presenter/movie.js';
 const EXTRA_FILM_COUNT = 2;
 const FILM_COUNT_PER_STEP = 5;
 const MOST_COMMENTED_TITLE = 'Most commented';
+
 export default class MovieList {
   constructor(container, moviesModel, commentsModel, filterModel) {
     this._container = container;
@@ -33,8 +34,8 @@ export default class MovieList {
     this._filmsListContainer = null;
     this._topRatedListContainer = null;
     this._mostCommentedContainer = null;
-    this._currentSortType = SortTypes.DEFAULT;
 
+    this._currentSortType = SortTypes.DEFAULT;
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
 
     this._filmCardPresenter = {};
@@ -48,6 +49,7 @@ export default class MovieList {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._moviesModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+    this._commentsModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -57,7 +59,7 @@ export default class MovieList {
   _getMovies() {
     const filterType = this._filterModel.getFilter();
     const movies = this._moviesModel.getMovies().slice();
-    const filtredMovies = movieToFilterMap[filterType](movies);
+    const filtredMovies = filter[filterType](movies);
 
     switch (this._currentSortType) {
       case SortTypes.DATE:
@@ -78,11 +80,36 @@ export default class MovieList {
       case UserAction.UPDATE_MOVIE:
         this._moviesModel.updateMovie(updateType, update);
         break;
+      case UserAction.UPDATE_COMMENTS:
+        this._commentsModel.updateComments(updateType, update);
+        break;
+      case UserAction.ADD_COMMENT:
+        this._commentsModel.addComment(updateType, update);
+        break;
+      case UserAction.DELETE_COMMENT:
+        this._commentsModel.deleteComment(updateType, update);
+        break;
     }
   }
 
   _handleModelEvent(updateType) {
     switch (updateType) {
+      // case UpdateType.PATCH:
+      //   if(this._filmCardPresenter[data.id]) {
+      //     console.log('1', data.id);
+      //     this._filmCardPresenter[data.id].init(data, this._getComments());
+      //   }
+
+      //   if (this._topRatedFilmCardPresenter[data.id]) {
+      //     console.log('2', data.id);
+      //     this._topRatedFilmCardPresenter[data.id].init(data, this._getComments());
+      //   }
+
+      //   if (this._mostCommentedFilmCardPresenter[data.id]) {
+      //     console.log('3', data.id);
+      //     this._mostCommentedFilmCardPresenter[data.id].init(data, this._getComments());
+      //   }
+      //   break;
       case UpdateType.MINOR:
         this._clearMovieList();
         this._renderGeneralMoviesList();

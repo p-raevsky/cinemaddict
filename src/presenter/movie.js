@@ -29,6 +29,7 @@ export default class Movie {
     this._handleFavoriteInPopupClick = this._handleFavoriteInPopupClick.bind(this);
     this._handleWatchedInPopupClick = this._handleWatchedInPopupClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
+    this._handleDeleteCommentClick = this._handleDeleteCommentClick.bind(this);
   }
 
   init(movie, comments) {
@@ -78,6 +79,7 @@ export default class Movie {
     this._detailedFilmCardComponent.setFavoriteInPopupClickHandler(this._handleFavoriteInPopupClick);
     this._detailedFilmCardComponent.setWatchedInPopupClickHandler(this._handleWatchedInPopupClick);
     this._detailedFilmCardComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._detailedFilmCardComponent.setCommentDeleteHandler(this._handleDeleteCommentClick);
 
     if (prevDetailedFilmCardComponent === null) {
       render(bodyElement, this._detailedFilmCardComponent);
@@ -131,17 +133,44 @@ export default class Movie {
   _handleAddToWatchlistClick(){
     const movie = this._movie;
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isWatchlist: !movie.userDetails.isWatchlist});
-    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      {
+        isWatchlist: !movie.userDetails.isWatchlist,
+      },
+    );
+
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+
   }
 
   _handleFavoriteClick() {
     const movie = this._movie;
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isFavorite: !movie.userDetails.isFavorite});
-    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      {
+        isFavorite: !movie.userDetails.isFavorite,
+      },
+    );
+
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
   }
@@ -149,8 +178,21 @@ export default class Movie {
   _handleWatchedClick() {
     const movie = this._movie;
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isAlreadyWatched: !movie.userDetails.isAlreadyWatched});
-    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      {
+        isAlreadyWatched: !movie.userDetails.isAlreadyWatched,
+      },
+    );
+
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
   }
@@ -158,35 +200,102 @@ export default class Movie {
   _handleAddToWatchlistInPopupClick() {
     const movie = this._movie;
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isWatchlist: !movie.userDetails.isWatchlist});
-    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      {
+        isWatchlist: !movie.userDetails.isWatchlist,
+      },
+    );
+
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
-    this._renderDetailedFilmCard(newMovie, this._comments);
   }
 
   _handleFavoriteInPopupClick() {
     const movie = this._movie;
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isFavorite: !movie.userDetails.isFavorite});
-    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      {
+        isFavorite: !movie.userDetails.isFavorite,
+      },
+    );
+
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
-    this._renderDetailedFilmCard(newMovie, this._comments);
   }
 
   _handleWatchedInPopupClick() {
     const movie = this._movie;
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isAlreadyWatched: !movie.userDetails.isAlreadyWatched});
-    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      {
+        isAlreadyWatched: !movie.userDetails.isAlreadyWatched,
+      },
+    );
+
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
-    this._renderDetailedFilmCard(newMovie, this._comments);
   }
 
   _handleFormSubmit(comment) {
-    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, comment);// проверить!!!!!!!!
+    const movieComments = this._movie.comments;
+
+    const newComments = [...movieComments.slice(), comment.id];
+    const newMovie = Object.assign(
+      {},
+      this._movie,
+      {
+        comments: newComments,
+      },
+    );
+
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+    this._changeData(UserAction.ADD_COMMENT, UpdateType.MINOR, comment);
+    this.closePopup();
+    //открыть попапам с обновленными комментариями.
+  }
+
+  _handleDeleteCommentClick(comment) {
+    const movieComments = this._movie.comments;
+    const filteredComments = movieComments.filter((item) => item !== comment.id);
+    const newMovie = Object.assign(
+      {},
+      this._movie,
+      {
+        comments: filteredComments,
+      },
+    );
+
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+    this._changeData(UserAction.DELETE_COMMENT, UpdateType.MINOR, comment);
+    this.closePopup();
+    //открыть попапам с обновленными комментариями.
   }
 
   destroy() {
