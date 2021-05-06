@@ -132,7 +132,7 @@ export const generateMovie = (id) => {
 
   return {
     id,
-    comments: getRandomArray(getRandomNumbersArray(0, MOVIES_AMOUNT), REGULAR_AMOUNT),
+    comments: getRandomArray(getRandomNumbersArray(0, MOVIES_AMOUNT - 1), REGULAR_AMOUNT),
     filmInfo: {
       title,
       alternativeTitle,

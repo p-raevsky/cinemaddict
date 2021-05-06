@@ -27,10 +27,10 @@ const movies = idArray.map((id) => generateMovie(id));
 const totalMovieCount = getRandomNumber(MIN_FILM_NUMBER, MAX_FILM_NUMBER);
 
 const moviesModel = new MoviesModel();
-moviesModel.setMovies(movies);
+moviesModel.set(movies);
 
 const commentsModel = new CommentsModel();
-commentsModel.setComments(comments);
+commentsModel.set(comments);
 
 const filterModel = new FilterModel();
 

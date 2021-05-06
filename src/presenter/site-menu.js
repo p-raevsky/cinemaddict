@@ -21,7 +21,7 @@ export default class SiteMenu {
     const filters = this._getFilters();
     const prevFilterComponent = this._siteMenuComponent;
 
-    this._siteMenuComponent = new SiteMenuView(filters, this._filterModel.getFilter());
+    this._siteMenuComponent = new SiteMenuView(filters, this._filterModel.get());
     this._siteMenuComponent.setFilterTypeClickHandler(this._handleFilterTypeClick);
 
     if (prevFilterComponent === null) {
@@ -39,15 +39,15 @@ export default class SiteMenu {
   }
 
   _handleFilterTypeClick(filterType) {
-    if (this._filterModel.getFilter() === filterType) {
+    if (this._filterModel.get() === filterType) {
       return;
     }
 
-    this._filterModel.setFilter(UpdateType.MAJOR, filterType);
+    this._filterModel.set(UpdateType.MAJOR, filterType);
   }
 
   _getFilters() {
-    const movies = this._moviesModel.getMovies();
+    const movies = this._moviesModel.get();
 
     return [
       {

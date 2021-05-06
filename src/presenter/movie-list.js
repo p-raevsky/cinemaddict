@@ -45,7 +45,6 @@ export default class MovieList {
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
-    this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._moviesModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
@@ -57,8 +56,8 @@ export default class MovieList {
   }
 
   _getMovies() {
-    const filterType = this._filterModel.getFilter();
-    const movies = this._moviesModel.getMovies().slice();
+    const filterType = this._filterModel.get();
+    const movies = this._moviesModel.get().slice();
     const filtredMovies = filter[filterType](movies);
 
     switch (this._currentSortType) {
@@ -71,17 +70,13 @@ export default class MovieList {
     return filtredMovies;
   }
 
-  _getComments() {
-    return this._commentsModel.getComments().slice();
-  }
-
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
         this._moviesModel.updateMovie(updateType, update);
         break;
       case UserAction.UPDATE_COMMENTS:
-        this._commentsModel.updateComments(updateType, update);
+        this._commentsModel.update(updateType, update);
         break;
       case UserAction.ADD_COMMENT:
         this._commentsModel.addComment(updateType, update);
@@ -94,22 +89,6 @@ export default class MovieList {
 
   _handleModelEvent(updateType) {
     switch (updateType) {
-      // case UpdateType.PATCH:
-      //   if(this._filmCardPresenter[data.id]) {
-      //     console.log('1', data.id);
-      //     this._filmCardPresenter[data.id].init(data, this._getComments());
-      //   }
-
-      //   if (this._topRatedFilmCardPresenter[data.id]) {
-      //     console.log('2', data.id);
-      //     this._topRatedFilmCardPresenter[data.id].init(data, this._getComments());
-      //   }
-
-      //   if (this._mostCommentedFilmCardPresenter[data.id]) {
-      //     console.log('3', data.id);
-      //     this._mostCommentedFilmCardPresenter[data.id].init(data, this._getComments());
-      //   }
-      //   break;
       case UpdateType.MINOR:
         this._clearMovieList();
         this._renderGeneralMoviesList();
@@ -119,12 +98,6 @@ export default class MovieList {
         this._renderGeneralMoviesList();
         break;
     }
-  }
-
-  _handleModeChange() {
-    Object
-      .values(this._filmCardPresenter)
-      .forEach((presenter) => presenter.closePopup());
   }
 
   _renderSort() {
@@ -148,9 +121,9 @@ export default class MovieList {
     this._renderGeneralMoviesList();
   }
 
-  _renderMovie(container, movie, comments) {
-    const moviePresenter = new MoviePresenter(container, this._handleViewAction, this._handleModeChange);
-    moviePresenter.init(movie, comments);
+  _renderMovie(container, id) {
+    const moviePresenter = new MoviePresenter(container, this._handleViewAction, id, this._commentsModel, this._moviesModel);
+    moviePresenter.init();
 
     return moviePresenter;
   }
@@ -160,7 +133,7 @@ export default class MovieList {
     const movies = this._getMovies().slice(0, Math.min(movieCount, this._renderedFilmCount));
 
     movies.forEach((movie) => {
-      const presenter = this._renderMovie(this._filmsListContainer, movie, this._getComments());
+      const presenter = this._renderMovie(this._filmsListContainer, movie.id);
       this._filmCardPresenter[movie.id] = presenter;
     });
 
@@ -182,12 +155,12 @@ export default class MovieList {
 
   _handleShowMoreButtonClick() {
     const movieCount = this._getMovies().length;
-    const newRenderedMovieCount = Math.min(movieCount, this._renderedFilmCount + FILM_COUNT_PER_STEP);///проверить
+    const newRenderedMovieCount = Math.min(movieCount, this._renderedFilmCount + FILM_COUNT_PER_STEP);
     const movies = this._getMovies().slice(this._renderedFilmCount, newRenderedMovieCount);
 
     movies
       .forEach((movie) => {
-        const presenter = this._renderMovie(this._filmsListContainer, movie, this._getComments());
+        const presenter = this._renderMovie(this._filmsListContainer, movie.id);
         this._filmCardPresenter[movie.id] = presenter;
       });
 
@@ -208,7 +181,7 @@ export default class MovieList {
       .sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating)
       .slice(0, EXTRA_FILM_COUNT)
       .forEach((movie) => {
-        const presenter = this._renderMovie(this._topRatedListContainer, movie, this._getComments());
+        const presenter = this._renderMovie(this._topRatedListContainer, movie.id);
         this._topRatedFilmCardPresenter[movie.id] = presenter;
       });
   }
@@ -230,7 +203,7 @@ export default class MovieList {
       .sort((a, b) => b.comments.length - a.comments.length)
       .slice(0, EXTRA_FILM_COUNT)
       .forEach((movie) => {
-        const presenter = this._renderMovie(this._mostCommentedContainer, movie, this._getComments());
+        const presenter = this._renderMovie(this._mostCommentedContainer, movie.id);
         this._mostCommentedFilmCardPresenter[movie.id] = presenter;
       });
   }

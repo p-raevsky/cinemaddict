@@ -2,18 +2,15 @@ import FilmCardView from '../view/film-card.js';
 import DetailedFilmCardView from '../view/detailed-film-card.js';
 import {render, remove, replace}  from '../utils/render.js';
 import {bodyElement} from '../elements.js';
-import {UserAction, UpdateType} from '../const.js';
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  POPUP: 'POPUP',
-};
+import {UserAction, UpdateType, Mode} from '../const.js';
 
 export default class Movie {
-  constructor(container, changeData, changeMode) {
+  constructor(container, changeData, id, commentsModel, moviesModel) {
     this._container = container;
     this._changeData = changeData;
-    this._changeMode = changeMode;
+    this._commentsModel = commentsModel;
+    this._moviesModel = moviesModel;
+    this._id = id;
 
     this._filmCardComponent = null;
     this._detailedFilmCardComponent = null;
@@ -32,14 +29,11 @@ export default class Movie {
     this._handleDeleteCommentClick = this._handleDeleteCommentClick.bind(this);
   }
 
-  init(movie, comments) {
+  init() {
     this._mode = Mode.DEFAULT;
-    this._movie = movie;
-    this._comments = this._getMovieComments(this._movie, comments);
 
     const prevFilmCardComponent = this._filmCardComponent;
-
-    this._filmCardComponent =  new FilmCardView(this._movie);
+    this._filmCardComponent =  new FilmCardView(this._getMovie());
 
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick, '.film-card__poster');
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick, '.film-card__title');
@@ -61,8 +55,21 @@ export default class Movie {
     remove(prevFilmCardComponent);
   }
 
-  _getMovieComments(movie, commentsArray) {
-    const {comments} = movie;
+  _getMovie() {
+    const movies = this._moviesModel.get().slice();
+    const [movie] = movies.filter((movie) => this._id === movie.id);
+
+    return movie;
+  }
+
+  _getComments() {
+    return this._commentsModel.get().slice();
+  }
+
+  _getMovieComments() {
+    const commentsArray = this._getComments();
+
+    const {comments} = this._getMovie();
 
     return commentsArray.filter(({id}) => comments.includes(id));
   }
@@ -101,37 +108,34 @@ export default class Movie {
     remove(prevDetailedFilmCardComponent);
   }
 
-  closePopup() {
+  closeDetailedFilmCard() {
     if (this._mode !== Mode.DEFAULT) {
       this._detailedFilmCardComponent.getElement().remove();
       this._detailedFilmCardComponent = null;
       this._mode = Mode.DEFAULT;
     }
+
+    bodyElement.classList.remove('hide-overflow');
+    document.removeEventListener('keydown', this._documentKeydownHandler);
   }
 
   _documentKeydownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.closePopup();
-      bodyElement.classList.remove('hide-overflow');
-
-      document.removeEventListener('keydown', this._documentKeydownHandler);
+      this.closeDetailedFilmCard();
     }
   }
 
   _handleCloseButtonClick() {
-    this.closePopup();
-    bodyElement.classList.remove('hide-overflow');
-
-    document.removeEventListener('keydown', this._documentKeydownHandler);
+    this.closeDetailedFilmCard();
   }
 
   _handleFilmCardClick() {
-    this._renderDetailedFilmCard(this._movie, this._comments);
+    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
   }
 
   _handleAddToWatchlistClick(){
-    const movie = this._movie;
+    const movie = this._getMovie();
 
     const newUserDetails = Object.assign(
       {},
@@ -150,11 +154,10 @@ export default class Movie {
     );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
-
   }
 
   _handleFavoriteClick() {
-    const movie = this._movie;
+    const movie = this._getMovie();
 
     const newUserDetails = Object.assign(
       {},
@@ -176,7 +179,7 @@ export default class Movie {
   }
 
   _handleWatchedClick() {
-    const movie = this._movie;
+    const movie = this._getMovie();
 
     const newUserDetails = Object.assign(
       {},
@@ -198,7 +201,7 @@ export default class Movie {
   }
 
   _handleAddToWatchlistInPopupClick() {
-    const movie = this._movie;
+    const movie = this._getMovie();
 
     const newUserDetails = Object.assign(
       {},
@@ -217,10 +220,12 @@ export default class Movie {
     );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+    this.closeDetailedFilmCard();
+    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
   }
 
   _handleFavoriteInPopupClick() {
-    const movie = this._movie;
+    const movie = this._getMovie();
 
     const newUserDetails = Object.assign(
       {},
@@ -239,10 +244,12 @@ export default class Movie {
     );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+    this.closeDetailedFilmCard();
+    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
   }
 
   _handleWatchedInPopupClick() {
-    const movie = this._movie;
+    const movie = this._getMovie();
 
     const newUserDetails = Object.assign(
       {},
@@ -261,15 +268,17 @@ export default class Movie {
     );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+    this.closeDetailedFilmCard();
+    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
   }
 
   _handleFormSubmit(comment) {
-    const movieComments = this._movie.comments;
+    const movieComments = this._getMovie().comments;
 
     const newComments = [...movieComments.slice(), comment.id];
     const newMovie = Object.assign(
       {},
-      this._movie,
+      this._getMovie(),
       {
         comments: newComments,
       },
@@ -277,16 +286,16 @@ export default class Movie {
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
     this._changeData(UserAction.ADD_COMMENT, UpdateType.MINOR, comment);
-    this.closePopup();
-    //открыть попапам с обновленными комментариями.
+    this.closeDetailedFilmCard();
+    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
   }
 
   _handleDeleteCommentClick(comment) {
-    const movieComments = this._movie.comments;
+    const movieComments = this._getMovie().comments;
     const filteredComments = movieComments.filter((item) => item !== comment.id);
     const newMovie = Object.assign(
       {},
-      this._movie,
+      this._getMovie(),
       {
         comments: filteredComments,
       },
@@ -294,8 +303,8 @@ export default class Movie {
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
     this._changeData(UserAction.DELETE_COMMENT, UpdateType.MINOR, comment);
-    this.closePopup();
-    //открыть попапам с обновленными комментариями.
+    this.closeDetailedFilmCard();
+    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
   }
 
   destroy() {

@@ -6,15 +6,15 @@ export default class Comments extends Observer {
     this._comments = [];
   }
 
-  setComments(comments) {
+  set(comments) {
     this._comments = comments.slice();
   }
 
-  getComments() {
+  get() {
     return this._comments;
   }
 
-  updateComments(updateType, update) {
+  update(updateType, update) {
     const index = this._comments.findIndex((comment) => comment.id === update.id);
 
     if (index === -1) {

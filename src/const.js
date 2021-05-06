@@ -12,20 +12,25 @@ export const SortTypes = {
 };
 
 export const UserAction = {
-  UPDATE_MOVIE: 'UPDATE_MOVIE',
-  UPDATE_COMMENTS: 'UPDATE_COMMENTS',
-  ADD_COMMENT: 'ADD_COMMENT',
-  DELETE_COMMENT: 'DELETE_COMMENT',
+  UPDATE_MOVIE: 'Update movie',
+  UPDATE_COMMENTS: 'Update comments',
+  ADD_COMMENT: 'Add comment',
+  DELETE_COMMENT: 'Delete comment',
 };
 
 export const UpdateType = {
-  PATCH: 'PATCH',
-  MINOR: 'MINOR',
-  MAJOR: 'MAJOR',
+  PATCH: 'Patch',
+  MINOR: 'Minor',
+  MAJOR: 'Major',
 };
 
 export const RANK = {
   NOVICE: 'Novice',
   FAN: 'Fan',
-  MOVIE_BUF: 'Movie Buff',
+  MOVIE_BUFF: 'Movie Buff',
+};
+
+export const Mode = {
+  DEFAULT: 'Default',
+  POPUP: 'Popup',
 };

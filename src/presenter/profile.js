@@ -22,7 +22,7 @@ export default class Profile {
   }
 
   _getMovies() {
-    return this._moviesModel.getMovies().slice();
+    return this._moviesModel.get().slice();
   }
 
   _getStatus() {
