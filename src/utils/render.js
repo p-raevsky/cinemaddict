@@ -1,6 +1,11 @@
 import Abstract from '../view/abstract.js';
 
-export const render = (container, child) => {
+export const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+};
+
+export const render = (container, child, place) => {
   if (child instanceof Abstract) {
     child = child.getElement();
   }
@@ -9,13 +14,19 @@ export const render = (container, child) => {
     container = container.getElement();
   }
 
-  container.appendChild(child);
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(child);
+      break;
+    default:
+      container.append(child);
+      break;
+  }
 };
 
 export const createElement = (template) => {
   const newElement = document.createElement('div');
   newElement.innerHTML = template;
-
   return newElement.firstChild;
 };
 

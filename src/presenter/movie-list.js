@@ -1,7 +1,7 @@
 import {mainElement} from '../elements.js';
 import {render, remove}  from '../utils/render.js';
 import {sortMovieByDate, sortMovieByRating} from '../utils/film-card-data.js';
-import {SortTypes, UpdateType, UserAction} from '../const.js';
+import {SortType, UpdateType, UserAction} from '../const.js';
 import {filter} from '../utils/filter.js';
 
 import FilmsContainerView from '../view/films-container.js';
@@ -35,7 +35,7 @@ export default class MovieList {
     this._topRatedListContainer = null;
     this._mostCommentedContainer = null;
 
-    this._currentSortType = SortTypes.DEFAULT;
+    this._currentSortType = SortType.DEFAULT;
     this._renderedFilmCount = FILM_COUNT_PER_STEP;
 
     this._filmCardPresenter = {};
@@ -61,9 +61,9 @@ export default class MovieList {
     const filtredMovies = filter[filterType](movies);
 
     switch (this._currentSortType) {
-      case SortTypes.DATE:
+      case SortType.DATE:
         return filtredMovies.sort(sortMovieByDate);
-      case SortTypes.RATING:
+      case SortType.RATING:
         return filtredMovies.sort(sortMovieByRating);
     }
 
@@ -238,7 +238,7 @@ export default class MovieList {
     }
 
     if (resetSortType) {
-      this._currentSortType = SortTypes.DEFAULT;
+      this._currentSortType = SortType.DEFAULT;
     }
   }
 
@@ -263,5 +263,15 @@ export default class MovieList {
     this._renderRegularMovieList();
     this._renderTopRatedList();
     this._renderMostCommentedList();
+  }
+
+  show() {
+    this._sortingComponent.getElement().classList.remove('visually-hidden');
+    this._filmsContainerComponent.getElement().classList.remove('visually-hidden');
+  }
+
+  hide() {
+    this._sortingComponent.getElement().classList.add('visually-hidden');
+    this._filmsContainerComponent.getElement().classList.add('visually-hidden');
   }
 }

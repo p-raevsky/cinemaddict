@@ -1,6 +1,8 @@
-import AbstractView from './abstract.js';
+import SmartView from './smart.js';
+import Chart from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-const createStatisticTemplate = () => {
+const createStatisticTemplate = (movies) => {
   return `<section class="statistic visually-hidden">
     <p class="statistic__rank">
       Your rank
@@ -49,8 +51,13 @@ const createStatisticTemplate = () => {
   </section>`;
 };
 
-export default class Statistic extends AbstractView {
+export default class Statistic extends SmartView {
+  constructor(movies) {
+    super();
+    this._movies = movies;
+  }
+
   getTemplate() {
-    return createStatisticTemplate();
+    return createStatisticTemplate(this._movies);
   }
 }

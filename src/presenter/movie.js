@@ -33,7 +33,7 @@ export default class Movie {
     this._mode = Mode.DEFAULT;
 
     const prevFilmCardComponent = this._filmCardComponent;
-    this._filmCardComponent =  new FilmCardView(this._getMovie());
+    this._filmCardComponent =  new FilmCardView(this._getMovie(), this._getMovieComments());
 
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick, '.film-card__poster');
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick, '.film-card__title');
@@ -44,7 +44,6 @@ export default class Movie {
 
     if (prevFilmCardComponent === null) {
       render(this._container, this._filmCardComponent);
-
       return;
     }
 
@@ -58,7 +57,6 @@ export default class Movie {
   _getMovie() {
     const movies = this._moviesModel.get().slice();
     const [movie] = movies.filter((movie) => this._id === movie.id);
-
     return movie;
   }
 
@@ -68,9 +66,7 @@ export default class Movie {
 
   _getMovieComments() {
     const commentsArray = this._getComments();
-
     const {comments} = this._getMovie();
-
     return commentsArray.filter(({id}) => comments.includes(id));
   }
 
@@ -92,14 +88,11 @@ export default class Movie {
       render(bodyElement, this._detailedFilmCardComponent);
       bodyElement.classList.add('hide-overflow');
       document.addEventListener('keydown', this._documentKeydownHandler);
-
       return;
     }
 
     if (this._mode === Mode.POPUP) {
-      const scrollPosition = prevDetailedFilmCardComponent.getElement().scrollTop;
       replace(this._detailedFilmCardComponent, prevDetailedFilmCardComponent);
-      this._detailedFilmCardComponent.getElement().scrollTo(0, scrollPosition);
 
       bodyElement.classList.add('hide-overflow');
       document.addEventListener('keydown', this._documentKeydownHandler);
@@ -220,8 +213,16 @@ export default class Movie {
     );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+
+    const scrollPosition = document.querySelector('.film-details').scrollTop;
+
     this.closeDetailedFilmCard();
     this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
+
+    if (scrollPosition !== 0) {
+      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
+      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
+    }
   }
 
   _handleFavoriteInPopupClick() {
@@ -244,8 +245,16 @@ export default class Movie {
     );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+
+    const scrollPosition = document.querySelector('.film-details').scrollTop;
+
     this.closeDetailedFilmCard();
     this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
+
+    if (scrollPosition !== 0) {
+      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
+      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
+    }
   }
 
   _handleWatchedInPopupClick() {
@@ -268,8 +277,16 @@ export default class Movie {
     );
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+
+    const scrollPosition = document.querySelector('.film-details').scrollTop;
+
     this.closeDetailedFilmCard();
     this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
+
+    if (scrollPosition !== 0) {
+      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
+      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
+    }
   }
 
   _handleFormSubmit(comment) {
@@ -286,8 +303,16 @@ export default class Movie {
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
     this._changeData(UserAction.ADD_COMMENT, UpdateType.MINOR, comment);
+
+    const scrollPosition = document.querySelector('.film-details').scrollTop;
+
     this.closeDetailedFilmCard();
     this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
+
+    if (scrollPosition !== 0) {
+      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
+      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
+    }
   }
 
   _handleDeleteCommentClick(comment) {

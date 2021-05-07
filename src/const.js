@@ -1,11 +1,12 @@
-export const FILTER = {
+export const MenuItem = {
   ALL_MOVIES: 'All movies',
   WATHCLIST: 'Watchlist',
   FAVOURITES: 'Favorites',
   HISTORY: 'History',
+  STATISTICS: 'Statistics',
 };
 
-export const SortTypes = {
+export const SortType = {
   DEFAULT: 'Sort by default',
   DATE: 'Sort by date',
   RATING: 'Sort by rating',

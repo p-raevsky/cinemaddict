@@ -1,4 +1,5 @@
 import {bodyElement, mainElement} from './elements.js';
+import {MenuItem, UpdateType} from './const.js';
 
 import {generateMovie} from './mock/movie.js';
 import {generateComment} from './mock/comment.js';
@@ -35,16 +36,38 @@ commentsModel.set(comments);
 const filterModel = new FilterModel();
 
 const profilePresenter = new ProfilePresenter(headerElement, moviesModel);
-profilePresenter.init();
-
 const siteMenuPresenter = new SiteMenuPresenter(mainElement, filterModel, moviesModel);
-siteMenuPresenter.init();
-
 const statisticPresenter = new StatisticPresenter(mainElement, moviesModel);
-statisticPresenter.init();
-
 const movieListPresenter = new MovieListPresenter(mainElement, moviesModel, commentsModel, filterModel);
-movieListPresenter.init();
-
 const footerStatisticPresenter = new FooterStatisticPresenter(footerElement, moviesModel, totalMovieCount);
+
+profilePresenter.init();
+siteMenuPresenter.init();
+statisticPresenter.init();
+movieListPresenter.init();
 footerStatisticPresenter.init();
+
+const handleMenuItemClick = (menuItem) => {
+  switch (menuItem) {
+    case MenuItem.STATISTICS:
+      filterModel.set(UpdateType.MAJOR, MenuItem.STATISTICS);
+      siteMenuPresenter.toggleMenuItem(menuItem);
+      movieListPresenter.hide();
+      statisticPresenter.show();
+      break;
+
+    default:
+      siteMenuPresenter.toggleMenuItem(menuItem);
+      statisticPresenter.hide();
+      movieListPresenter.show();
+      break;
+  }
+};
+
+const mainNavigation = document.querySelector('.main-navigation');
+
+mainNavigation.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  const menuItemType = evt.target.dataset.type;
+  handleMenuItemClick(menuItemType);
+});

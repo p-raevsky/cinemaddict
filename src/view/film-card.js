@@ -16,8 +16,8 @@ const createMovieComments = (comments) => {
 
 const isSelectedFilmControl = (isChecked) => isChecked ? 'film-card__controls-item--active' : '';
 
-const createFilmCardTemplate = (movie) => {
-  const {comments, filmInfo, userDetails} = movie;
+const createFilmCardTemplate = (movie, comments) => {
+  const {filmInfo, userDetails} = movie;
   const {
     description,
     genres,
@@ -67,9 +67,10 @@ const createFilmCardTemplate = (movie) => {
 };
 
 export default class FilmCard extends AbstractView {
-  constructor(movie) {
+  constructor(movie, comments) {
     super();
     this._movie = movie;
+    this._comments = comments;
     this._filmCardClickHandler = this._filmCardClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._addToWatchlistClickHandler = this._addToWatchlistClickHandler.bind(this);
@@ -77,7 +78,7 @@ export default class FilmCard extends AbstractView {
   }
 
   getTemplate() {
-    return createFilmCardTemplate(this._movie);
+    return createFilmCardTemplate(this._movie, this._comments);
   }
 
   _filmCardClickHandler(evt) {
