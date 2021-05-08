@@ -3,6 +3,7 @@ import DetailedFilmCardView from '../view/detailed-film-card.js';
 import {render, remove, replace}  from '../utils/render.js';
 import {bodyElement} from '../elements.js';
 import {UserAction, UpdateType, Mode} from '../const.js';
+import dayjs from 'dayjs';
 
 export default class Movie {
   constructor(container, changeData, id, commentsModel, moviesModel) {
@@ -179,6 +180,7 @@ export default class Movie {
       movie.userDetails,
       {
         isAlreadyWatched: !movie.userDetails.isAlreadyWatched,
+        watchingDate: !movie.userDetails.isAlreadyWatched ? dayjs() : '',
       },
     );
 

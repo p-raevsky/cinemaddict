@@ -1,6 +1,6 @@
 import ProfileView from '../view/profile.js';
 import {remove, render, replace}  from '../utils/render.js';
-import {rank} from '../utils/rank.js';
+import {getRankName} from '../utils/rank.js';
 
 export default class Profile {
   constructor(container, moviesModel) {
@@ -26,13 +26,7 @@ export default class Profile {
   }
 
   _getStatus() {
-    const alreadyWatchedMovies = this._getMovies().filter((movie) => movie.userDetails.isAlreadyWatched);
-    const watchedMoviesAmount = alreadyWatchedMovies.length;
-    const [rankName] = Object.entries(rank)
-      .filter(([, rankCount]) => rankCount(watchedMoviesAmount))
-      .flat();
-
-    return rankName;
+    return getRankName(this._getMovies());
   }
 
   _renderProfile() {

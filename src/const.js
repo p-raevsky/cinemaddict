@@ -25,7 +25,7 @@ export const UpdateType = {
   MAJOR: 'Major',
 };
 
-export const RANK = {
+export const Rank = {
   NOVICE: 'Novice',
   FAN: 'Fan',
   MOVIE_BUFF: 'Movie Buff',
@@ -34,4 +34,27 @@ export const RANK = {
 export const Mode = {
   DEFAULT: 'Default',
   POPUP: 'Popup',
+};
+
+export const Genre = {
+  ANIME: 'Anime',
+  FANTASY: 'Fantasy',
+  SCI_FI: 'Sci-Fi',
+  WESTERN: 'Western',
+  MISTERY: 'Mystery',
+  COMEDY: 'Comedy',
+  EPIC: 'Epic',
+  ACTION: 'Action',
+  HORROR: 'Horror',
+  DRAMA: 'Drama',
+};
+
+export const GENRES = Object.values(Genre);
+
+export const TimeRange = {
+  ALL_TIME: 'all-time',
+  DAY: 'day',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
 };
