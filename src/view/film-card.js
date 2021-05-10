@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
+import {generateRuntime} from '../utils/film-card-data.js';
 
 const MAX_LENGTH = 140;
 
@@ -8,15 +9,15 @@ const createMovieComments = (comments) => {
     return '0 comments';
   }
 
-  return comments.length >= 2
+  return comments.length > 1
     ? `${comments.length} comments`
-    : '1 comment';
+    : `${comments.length} comment`;
 };
 
 const isSelectedFilmControl = (isChecked) => isChecked ? 'film-card__controls-item--active' : '';
 
-const createFilmCardTemplate = (movie) => {
-  const {comments, filmInfo, userDetails} = movie;
+const createFilmCardTemplate = (movie, comments) => {
+  const {filmInfo, userDetails} = movie;
   const {
     description,
     genres,
@@ -35,6 +36,7 @@ const createFilmCardTemplate = (movie) => {
 
   const movieGenre = genres[0];
   const releaseDate = dayjs(release.date).format('YYYY');
+  const movieRuntime = generateRuntime(runtime);
   const movieDescriptionLength = description.length;
   const alternativeDescription = movieDescriptionLength > MAX_LENGTH
     ? `${description.substring(0, MAX_LENGTH - 1)}...`
@@ -50,7 +52,7 @@ const createFilmCardTemplate = (movie) => {
     <p class="film-card__rating">${totalRating}</p>
     <p class="film-card__info">
       <span class="film-card__year">${releaseDate}</span>
-      <span class="film-card__duration">${runtime}</span>
+      <span class="film-card__duration">${movieRuntime}</span>
       <span class="film-card__genre">${movieGenre}</span>
     </p>
     <img src="./${poster}" alt="" class="film-card__poster">
@@ -65,9 +67,10 @@ const createFilmCardTemplate = (movie) => {
 };
 
 export default class FilmCard extends AbstractView {
-  constructor(movie) {
+  constructor(movie, comments) {
     super();
     this._movie = movie;
+    this._comments = comments;
     this._filmCardClickHandler = this._filmCardClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._addToWatchlistClickHandler = this._addToWatchlistClickHandler.bind(this);
@@ -75,7 +78,7 @@ export default class FilmCard extends AbstractView {
   }
 
   getTemplate() {
-    return createFilmCardTemplate(this._movie);
+    return createFilmCardTemplate(this._movie, this._comments);
   }
 
   _filmCardClickHandler(evt) {

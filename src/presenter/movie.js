@@ -2,17 +2,16 @@ import FilmCardView from '../view/film-card.js';
 import DetailedFilmCardView from '../view/detailed-film-card.js';
 import {render, remove, replace}  from '../utils/render.js';
 import {bodyElement} from '../elements.js';
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  POPUP: 'POPUP',
-};
+import {UserAction, UpdateType, Mode} from '../const.js';
+import dayjs from 'dayjs';
 
 export default class Movie {
-  constructor(container, changeData, changeMode) {
+  constructor(container, changeData, id, commentsModel, moviesModel) {
     this._container = container;
     this._changeData = changeData;
-    this._changeMode = changeMode;
+    this._commentsModel = commentsModel;
+    this._moviesModel = moviesModel;
+    this._id = id;
 
     this._filmCardComponent = null;
     this._detailedFilmCardComponent = null;
@@ -28,16 +27,14 @@ export default class Movie {
     this._handleFavoriteInPopupClick = this._handleFavoriteInPopupClick.bind(this);
     this._handleWatchedInPopupClick = this._handleWatchedInPopupClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
+    this._handleDeleteCommentClick = this._handleDeleteCommentClick.bind(this);
   }
 
-  init(movie, comments) {
+  init() {
     this._mode = Mode.DEFAULT;
-    this._movie = movie;
-    this._comments = this._getMovieComments(this._movie, comments);
 
     const prevFilmCardComponent = this._filmCardComponent;
-
-    this._filmCardComponent =  new FilmCardView(this._movie);
+    this._filmCardComponent =  new FilmCardView(this._getMovie(), this._getMovieComments());
 
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick, '.film-card__poster');
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick, '.film-card__title');
@@ -48,7 +45,6 @@ export default class Movie {
 
     if (prevFilmCardComponent === null) {
       render(this._container, this._filmCardComponent);
-
       return;
     }
 
@@ -59,9 +55,19 @@ export default class Movie {
     remove(prevFilmCardComponent);
   }
 
-  _getMovieComments(movie, commentsArray) {
-    const {comments} = movie;
+  _getMovie() {
+    const movies = this._moviesModel.get().slice();
+    const [movie] = movies.filter((movie) => this._id === movie.id);
+    return movie;
+  }
 
+  _getComments() {
+    return this._commentsModel.get().slice();
+  }
+
+  _getMovieComments() {
+    const commentsArray = this._getComments();
+    const {comments} = this._getMovie();
     return commentsArray.filter(({id}) => comments.includes(id));
   }
 
@@ -77,19 +83,17 @@ export default class Movie {
     this._detailedFilmCardComponent.setFavoriteInPopupClickHandler(this._handleFavoriteInPopupClick);
     this._detailedFilmCardComponent.setWatchedInPopupClickHandler(this._handleWatchedInPopupClick);
     this._detailedFilmCardComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._detailedFilmCardComponent.setCommentDeleteHandler(this._handleDeleteCommentClick);
 
     if (prevDetailedFilmCardComponent === null) {
       render(bodyElement, this._detailedFilmCardComponent);
       bodyElement.classList.add('hide-overflow');
       document.addEventListener('keydown', this._documentKeydownHandler);
-
       return;
     }
 
     if (this._mode === Mode.POPUP) {
-      const scrollPosition = prevDetailedFilmCardComponent.getElement().scrollTop;
       replace(this._detailedFilmCardComponent, prevDetailedFilmCardComponent);
-      this._detailedFilmCardComponent.getElement().scrollTo(0, scrollPosition);
 
       bodyElement.classList.add('hide-overflow');
       document.addEventListener('keydown', this._documentKeydownHandler);
@@ -98,93 +102,236 @@ export default class Movie {
     remove(prevDetailedFilmCardComponent);
   }
 
-  closePopup() {
+  closeDetailedFilmCard() {
     if (this._mode !== Mode.DEFAULT) {
       this._detailedFilmCardComponent.getElement().remove();
       this._detailedFilmCardComponent = null;
       this._mode = Mode.DEFAULT;
     }
+
+    bodyElement.classList.remove('hide-overflow');
+    document.removeEventListener('keydown', this._documentKeydownHandler);
   }
 
   _documentKeydownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.closePopup();
-      bodyElement.classList.remove('hide-overflow');
-
-      document.removeEventListener('keydown', this._documentKeydownHandler);
+      this.closeDetailedFilmCard();
     }
   }
 
   _handleCloseButtonClick() {
-    this.closePopup();
-    bodyElement.classList.remove('hide-overflow');
-
-    document.removeEventListener('keydown', this._documentKeydownHandler);
+    this.closeDetailedFilmCard();
   }
 
   _handleFilmCardClick() {
-    this._renderDetailedFilmCard(this._movie, this._comments);
+    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
   }
 
   _handleAddToWatchlistClick(){
-    const movie = this._movie;
+    const movie = this._getMovie();
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isWatchlist: !movie.userDetails.isWatchlist});
-    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      {
+        isWatchlist: !movie.userDetails.isWatchlist,
+      },
+    );
 
-    this._changeData(newMovie);
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
+
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
   }
 
   _handleFavoriteClick() {
-    const movie = this._movie;
+    const movie = this._getMovie();
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isFavorite: !movie.userDetails.isFavorite});
-    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      {
+        isFavorite: !movie.userDetails.isFavorite,
+      },
+    );
 
-    this._changeData(newMovie);
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
+
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
   }
 
   _handleWatchedClick() {
-    const movie = this._movie;
+    const movie = this._getMovie();
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isAlreadyWatched: !movie.userDetails.isAlreadyWatched});
-    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      {
+        isAlreadyWatched: !movie.userDetails.isAlreadyWatched,
+        watchingDate: !movie.userDetails.isAlreadyWatched ? dayjs() : '',
+      },
+    );
 
-    this._changeData(newMovie);
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
+
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
   }
 
   _handleAddToWatchlistInPopupClick() {
-    const movie = this._movie;
+    const movie = this._getMovie();
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isWatchlist: !movie.userDetails.isWatchlist});
-    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      {
+        isWatchlist: !movie.userDetails.isWatchlist,
+      },
+    );
 
-    this._changeData(newMovie);
-    this._renderDetailedFilmCard(newMovie, this._comments);
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
+
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+
+    const scrollPosition = document.querySelector('.film-details').scrollTop;
+
+    this.closeDetailedFilmCard();
+    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
+
+    if (scrollPosition !== 0) {
+      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
+      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
+    }
   }
 
   _handleFavoriteInPopupClick() {
-    const movie = this._movie;
+    const movie = this._getMovie();
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isFavorite: !movie.userDetails.isFavorite});
-    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      {
+        isFavorite: !movie.userDetails.isFavorite,
+      },
+    );
 
-    this._changeData(newMovie);
-    this._renderDetailedFilmCard(newMovie, this._comments);
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
+
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+
+    const scrollPosition = document.querySelector('.film-details').scrollTop;
+
+    this.closeDetailedFilmCard();
+    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
+
+    if (scrollPosition !== 0) {
+      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
+      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
+    }
   }
 
   _handleWatchedInPopupClick() {
-    const movie = this._movie;
+    const movie = this._getMovie();
 
-    const newUserDetails = Object.assign({}, movie.userDetails, {isAlreadyWatched: !movie.userDetails.isAlreadyWatched});
-    const newMovie = Object.assign({}, movie, {userDetails: newUserDetails});
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      {
+        isAlreadyWatched: !movie.userDetails.isAlreadyWatched,
+      },
+    );
 
-    this._changeData(newMovie);
-    this._renderDetailedFilmCard(newMovie, this._comments);
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
+
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+
+    const scrollPosition = document.querySelector('.film-details').scrollTop;
+
+    this.closeDetailedFilmCard();
+    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
+
+    if (scrollPosition !== 0) {
+      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
+      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
+    }
   }
 
-  _handleFormSubmit() {
+  _handleFormSubmit(comment) {
+    const movieComments = this._getMovie().comments;
+
+    const newComments = [...movieComments.slice(), comment.id];
+    const newMovie = Object.assign(
+      {},
+      this._getMovie(),
+      {
+        comments: newComments,
+      },
+    );
+
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+    this._changeData(UserAction.ADD_COMMENT, UpdateType.MINOR, comment);
+
+    const scrollPosition = document.querySelector('.film-details').scrollTop;
+
+    this.closeDetailedFilmCard();
+    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
+
+    if (scrollPosition !== 0) {
+      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
+      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
+    }
+  }
+
+  _handleDeleteCommentClick(comment) {
+    const movieComments = this._getMovie().comments;
+    const filteredComments = movieComments.filter((item) => item !== comment.id);
+    const newMovie = Object.assign(
+      {},
+      this._getMovie(),
+      {
+        comments: filteredComments,
+      },
+    );
+
+    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+    this._changeData(UserAction.DELETE_COMMENT, UpdateType.MINOR, comment);
+    this.closeDetailedFilmCard();
+    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
   }
 
   destroy() {
