@@ -129,166 +129,44 @@ export default class Movie {
   }
 
   _handleAddToWatchlistClick(){
-    const movie = this._getMovie();
-
-    const newUserDetails = Object.assign(
-      {},
-      movie.userDetails,
-      {
-        isWatchlist: !movie.userDetails.isWatchlist,
-      },
-    );
-
-    const newMovie = Object.assign(
-      {},
-      movie,
-      {
-        userDetails: newUserDetails,
-      },
-    );
-
-    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+    this._updateUserDetailsData({
+      isWatchlist: !this._getMovie().userDetails.isWatchlist,
+    });
   }
 
   _handleFavoriteClick() {
-    const movie = this._getMovie();
-
-    const newUserDetails = Object.assign(
-      {},
-      movie.userDetails,
-      {
-        isFavorite: !movie.userDetails.isFavorite,
-      },
-    );
-
-    const newMovie = Object.assign(
-      {},
-      movie,
-      {
-        userDetails: newUserDetails,
-      },
-    );
-
-    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+    this._updateUserDetailsData({
+      isFavorite: !this._getMovie().userDetails.isFavorite,
+    });
   }
 
   _handleWatchedClick() {
-    const movie = this._getMovie();
-
-    const newUserDetails = Object.assign(
-      {},
-      movie.userDetails,
-      {
-        isAlreadyWatched: !movie.userDetails.isAlreadyWatched,
-        watchingDate: !movie.userDetails.isAlreadyWatched ? dayjs() : '',
-      },
-    );
-
-    const newMovie = Object.assign(
-      {},
-      movie,
-      {
-        userDetails: newUserDetails,
-      },
-    );
-
-    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+    this._updateUserDetailsData({
+      isAlreadyWatched: !this._getMovie().userDetails.isAlreadyWatched,
+      watchingDate: !this._getMovie().userDetails.isAlreadyWatched ? dayjs() : '',
+    });
   }
 
   _handleAddToWatchlistInPopupClick() {
-    const movie = this._getMovie();
-
-    const newUserDetails = Object.assign(
-      {},
-      movie.userDetails,
-      {
-        isWatchlist: !movie.userDetails.isWatchlist,
-      },
-    );
-
-    const newMovie = Object.assign(
-      {},
-      movie,
-      {
-        userDetails: newUserDetails,
-      },
-    );
-
-    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
-
-    const scrollPosition = document.querySelector('.film-details').scrollTop;
-
-    this.closeDetailedFilmCard();
-    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
-
-    if (scrollPosition !== 0) {
-      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
-      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
-    }
+    this._updateUserDetailsData({
+      isWatchlist: !this._getMovie().userDetails.isWatchlist,
+    });
+    this._updateDetailedFilmCard({newComment: false});
   }
 
   _handleFavoriteInPopupClick() {
-    const movie = this._getMovie();
-
-    const newUserDetails = Object.assign(
-      {},
-      movie.userDetails,
-      {
-        isFavorite: !movie.userDetails.isFavorite,
-      },
-    );
-
-    const newMovie = Object.assign(
-      {},
-      movie,
-      {
-        userDetails: newUserDetails,
-      },
-    );
-
-    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
-
-    const scrollPosition = document.querySelector('.film-details').scrollTop;
-
-    this.closeDetailedFilmCard();
-    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
-
-    if (scrollPosition !== 0) {
-      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
-      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
-    }
+    this._updateUserDetailsData({
+      isFavorite: !this._getMovie().userDetails.isFavorite,
+    });
+    this._updateDetailedFilmCard({newComment: false});
   }
 
   _handleWatchedInPopupClick() {
-    const movie = this._getMovie();
-
-    const newUserDetails = Object.assign(
-      {},
-      movie.userDetails,
-      {
-        isAlreadyWatched: !movie.userDetails.isAlreadyWatched,
-      },
-    );
-
-    const newMovie = Object.assign(
-      {},
-      movie,
-      {
-        userDetails: newUserDetails,
-      },
-    );
-
-    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
-
-    const scrollPosition = document.querySelector('.film-details').scrollTop;
-
-    this.closeDetailedFilmCard();
-    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
-
-    if (scrollPosition !== 0) {
-      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
-      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
-    }
+    this._updateUserDetailsData({
+      isAlreadyWatched: !this._getMovie().userDetails.isAlreadyWatched,
+      watchingDate: !this._getMovie().userDetails.isAlreadyWatched ? dayjs() : '',
+    });
+    this._updateDetailedFilmCard({newComment: false});
   }
 
   _handleFormSubmit(comment) {
@@ -306,15 +184,7 @@ export default class Movie {
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
     this._changeData(UserAction.ADD_COMMENT, UpdateType.MINOR, comment);
 
-    const scrollPosition = document.querySelector('.film-details').scrollTop;
-
-    this.closeDetailedFilmCard();
-    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
-
-    if (scrollPosition !== 0) {
-      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
-      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
-    }
+    this._updateDetailedFilmCard({newComment: true});
   }
 
   _handleDeleteCommentClick(comment) {
@@ -330,8 +200,47 @@ export default class Movie {
 
     this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
     this._changeData(UserAction.DELETE_COMMENT, UpdateType.MINOR, comment);
+
+    this._updateDetailedFilmCard({newComment: false});
+  }
+
+  _updateUserDetailsData(data, actionType = UpdateType.MINOR) {
+    const movie = this._getMovie();
+
+    const newUserDetails = Object.assign(
+      {},
+      movie.userDetails,
+      data,
+    );
+
+    const newMovie = Object.assign(
+      {},
+      movie,
+      {
+        userDetails: newUserDetails,
+      },
+    );
+
+    this._changeData(UserAction.UPDATE_MOVIE, actionType, newMovie);
+  }
+
+  _updateScrollPosition(scrollPosition, newComment) {
+    if (newComment && scrollPosition !== 0) {
+      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
+      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
+      return;
+    }
+
+    if (scrollPosition !== 0) {
+      document.querySelector('.film-details').scrollTo(0, scrollPosition);
+    }
+  }
+
+  _updateDetailedFilmCard({newComment = false}) {
+    const scrollPosition = document.querySelector('.film-details').scrollTop;
     this.closeDetailedFilmCard();
     this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
+    this._updateScrollPosition(scrollPosition, newComment);
   }
 
   destroy() {

@@ -36,8 +36,12 @@ export default class Filter extends AbstractView {
   }
 
   _menuItemClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.menuItemClick(evt.target.dataset.type);
+    if (evt.target.closest('.main-navigation a')) {
+      const el = evt.target.closest('.main-navigation a');
+      const dataType = el.dataset.type;
+      evt.preventDefault();
+      this._callback.menuItemClick(dataType);
+    }
   }
 
   setMenuItemClickHandler(callback) {

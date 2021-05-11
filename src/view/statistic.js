@@ -21,7 +21,7 @@ const createCountMoviesByGenre = (movies) => {
     };
   });
   const sortedMovieByGenreCounts = movieByGenreCounts.sort((a, b) => b.count - a.count);
-  return sortedMovieByGenreCounts;
+  return sortedMovieByGenreCounts ? sortedMovieByGenreCounts : [];
 };
 
 const getTopGenre = (movies) => {
@@ -29,7 +29,8 @@ const getTopGenre = (movies) => {
     return '';
   }
 
-  return createCountMoviesByGenre(movies)[0].genre;
+  const countMoviesByGenreArray = createCountMoviesByGenre(movies);
+  return countMoviesByGenreArray.length ? countMoviesByGenreArray[0].genre : '';
 };
 
 const renderChart = (statisticCtx, movies) => {
@@ -138,18 +139,18 @@ const renderStatistic = (movies) => {
   const topGenre = getTopGenre(movies);
 
   return `<ul class="statistic__text-list">
-    <li class="statistic__text-item">
-      <h4 class="statistic__item-title">You watched</h4>
-      <p class="statistic__item-text">${watchedMoviesCount ? watchedMoviesCount : '0'} <span class="statistic__item-description">movies</span></p>
-    </li>
-    <li class="statistic__text-item">
-      <h4 class="statistic__item-title">Total duration</h4>
-      <p class="statistic__item-text">${h} <span class="statistic__item-description">h</span> ${m} <span class="statistic__item-description">m</span></p>
-    </li>
-    <li class="statistic__text-item">
-      <h4 class="statistic__item-title">Top genre</h4>
-      <p class="statistic__item-text">${topGenre}</p>
-    </li>
+  <li class="statistic__text-item">
+    <h4 class="statistic__item-title">You watched</h4>
+    <p class="statistic__item-text">${watchedMoviesCount ? watchedMoviesCount : '0'} <span class="statistic__item-description">movies</span></p>
+  </li>
+  <li class="statistic__text-item">
+    <h4 class="statistic__item-title">Total duration</h4>
+    <p class="statistic__item-text">${h} <span class="statistic__item-description">h</span> ${m} <span class="statistic__item-description">m</span></p>
+  </li>
+  <li class="statistic__text-item">
+    <h4 class="statistic__item-title">Top genre</h4>
+    <p class="statistic__item-text">${topGenre}</p>
+  </li>
   </ul>`;
 };
 

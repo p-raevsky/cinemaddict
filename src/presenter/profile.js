@@ -33,7 +33,7 @@ export default class Profile {
     const prevProfileComponent = this._profileComponent;
     this._profileComponent = new ProfileView(this._getStatus());
 
-    if (this._getMovies().length === 0) {
+    if (!this._getMovies().length) {
       return;
     }
 

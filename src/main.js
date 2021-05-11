@@ -54,6 +54,7 @@ const handleMenuItemClick = (menuItem) => {
     case MenuItem.STATISTICS:
       filterModel.set(UpdateType.MAJOR, MenuItem.STATISTICS);
       siteMenuPresenter.toggleMenuItem(menuItem);
+      remove(statisticsComponent);
       statisticsComponent = new StatisticView(moviesModel.get());
       render(mainElement, statisticsComponent);
       movieListPresenter.hide();
@@ -70,7 +71,9 @@ const handleMenuItemClick = (menuItem) => {
 const mainNavigation = document.querySelector('.main-navigation');
 
 mainNavigation.addEventListener('click', (evt) => {
-  evt.preventDefault();
-  const menuItemType = evt.target.dataset.type;
-  handleMenuItemClick(menuItemType);
+  if (evt.target.closest('a')) {
+    evt.preventDefault();
+    const menuItemType = evt.target.dataset.type;
+    handleMenuItemClick(menuItemType);
+  }
 });

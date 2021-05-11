@@ -266,11 +266,19 @@ export default class MovieList {
   }
 
   show() {
+    if (!this._sortingComponent || !this._filmsContainerComponent) {
+      return;
+    }
+
     this._sortingComponent.getElement().classList.remove('visually-hidden');
     this._filmsContainerComponent.getElement().classList.remove('visually-hidden');
   }
 
   hide() {
+    if (!this._sortingComponent || !this._filmsContainerComponent) {
+      return;
+    }
+
     this._sortingComponent.getElement().classList.add('visually-hidden');
     this._filmsContainerComponent.getElement().classList.add('visually-hidden');
   }

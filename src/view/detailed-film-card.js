@@ -6,6 +6,7 @@ import Smart from '../view/smart.js';
 const DEFAULT_NEW_COMMENT = {
   comment: '',
   emotion: null,
+  date: '',
 };
 
 const createCommentTemplate = (commentData) => {
@@ -17,7 +18,7 @@ const createCommentTemplate = (commentData) => {
     id,
   } = commentData;
 
-  const commentDate = dayjs(date).format('YYYY/MM/DD HH:MM');
+  const commentDate = dayjs(date).format('YYYY/MM/DD HH:mm');
 
   return `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
@@ -254,7 +255,7 @@ export default class DetailedFilmCard extends Smart {
     return {
       comment: data.newComment.comment,
       emotion: data.newComment.emotion,
-      date: dayjs().toDate(),
+      date: dayjs(),
       id: Date.now(),
     };
   }
@@ -393,22 +394,30 @@ export default class DetailedFilmCard extends Smart {
 
   setCloseBtnClickHandler(callback) {
     this._callback.closeBtnClick = callback;
-    this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._closeBtnClickHandler);
+    this.getElement()
+      .querySelector('.film-details__close-btn')
+      .addEventListener('click', this._closeBtnClickHandler);
   }
 
   setFavoriteInPopupClickHandler(callback) {
     this._callback.favoriteInPopupClick = callback;
-    this.getElement().querySelector('#favorite').addEventListener('click', this._favoriteInPopupClickHandler);
+    this.getElement()
+      .querySelector('#favorite')
+      .addEventListener('click', this._favoriteInPopupClickHandler);
   }
 
   setAddToWatchlistInPopupClickHandler(callback) {
     this._callback.addToWatchlistInPopupClick = callback;
-    this.getElement().querySelector('#watchlist').addEventListener('click', this._addToWatchlistInPopupClickHandler);
+    this.getElement()
+      .querySelector('#watchlist')
+      .addEventListener('click', this._addToWatchlistInPopupClickHandler);
   }
 
   setWatchedInPopupClickHandler(callback) {
     this._callback.watchedInPopupClick = callback;
-    this.getElement().querySelector('#watched').addEventListener('click', this._watchedInPopupClickHandler);
+    this.getElement()
+      .querySelector('#watched')
+      .addEventListener('click', this._watchedInPopupClickHandler);
   }
 
   restoreHandlers() {
