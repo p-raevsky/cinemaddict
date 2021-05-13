@@ -1,5 +1,6 @@
 import FilmCardView from '../view/film-card.js';
 import DetailedFilmCardView from '../view/detailed-film-card.js';
+
 import {render, remove, replace}  from '../utils/render.js';
 import {bodyElement} from '../elements.js';
 import {UserAction, UpdateType, Mode} from '../const.js';
@@ -35,7 +36,7 @@ export default class Movie {
 
     const prevFilmCardComponent = this._filmCardComponent;
     this._filmCardComponent =  new FilmCardView(this._getMovie(), this._getMovieComments());
-
+    console.log('3_this._getMovie()', this._getMovie());
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick, '.film-card__poster');
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick, '.film-card__title');
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick, '.film-card__comments');
@@ -73,7 +74,7 @@ export default class Movie {
 
   _renderDetailedFilmCard(movie, comments) {
     this._mode = Mode.POPUP;
-
+    console.log('4_renderDetailedFilmCard', movie);
     const prevDetailedFilmCardComponent = this._detailedFilmCardComponent;
 
     this._detailedFilmCardComponent = new DetailedFilmCardView(movie, comments);

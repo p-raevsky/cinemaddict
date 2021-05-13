@@ -23,6 +23,7 @@ export const UpdateType = {
   PATCH: 'Patch',
   MINOR: 'Minor',
   MAJOR: 'Major',
+  INIT: 'Init',
 };
 
 export const Rank = {
