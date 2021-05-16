@@ -16,7 +16,7 @@ export default class Movies extends Observer {
     return this._movies;
   }
 
-  update(updateType, update) {
+  update(updateType, update, isNewcomment) {
     const index = this._movies.findIndex((movie) => movie.id === update.id);
 
     if (index === -1) {
@@ -29,7 +29,7 @@ export default class Movies extends Observer {
       ...this._movies.slice(index + 1),
     ];
 
-    this._notify(updateType, update);
+    this._notify(updateType, update, isNewcomment);
   }
 
   static adaptToClient(movie) {

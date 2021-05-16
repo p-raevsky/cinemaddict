@@ -1,22 +1,23 @@
 import FilmCardView from '../view/film-card.js';
 import DetailedFilmCardView from '../view/detailed-film-card.js';
-
 import {render, remove, replace}  from '../utils/render.js';
 import {bodyElement} from '../elements.js';
-import {UserAction, UpdateType, Mode} from '../const.js';
+import {UserAction, UpdateType, Mode, State} from '../const.js';
 import dayjs from 'dayjs';
 
 export default class Movie {
-  constructor(container, changeData, id, commentsModel, moviesModel) {
+  constructor(container, changeData, id, moviesModel, api) {
     this._container = container;
     this._changeData = changeData;
-    this._commentsModel = commentsModel;
     this._moviesModel = moviesModel;
+
+    this._mode = Mode.DEFAULT;
+    this._comments = null;
     this._id = id;
+    this._api = api;
 
     this._filmCardComponent = null;
     this._detailedFilmCardComponent = null;
-    this._mode = Mode.DEFAULT;
 
     this._documentKeydownHandler = this._documentKeydownHandler.bind(this);
     this._handleCloseButtonClick = this._handleCloseButtonClick.bind(this);
@@ -35,8 +36,8 @@ export default class Movie {
     this._mode = Mode.DEFAULT;
 
     const prevFilmCardComponent = this._filmCardComponent;
-    this._filmCardComponent =  new FilmCardView(this._getMovie(), this._getMovieComments());
-    console.log('3_this._getMovie()', this._getMovie());
+    this._filmCardComponent =  new FilmCardView(this._getMovie());
+
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick, '.film-card__poster');
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick, '.film-card__title');
     this._filmCardComponent.setFilmCardClickHandler(this._handleFilmCardClick, '.film-card__comments');
@@ -56,25 +57,23 @@ export default class Movie {
     remove(prevFilmCardComponent);
   }
 
+  _handleModelEvent(... Args) {
+    const [,, isNewComment] = Args;
+
+    if (this._mode === Mode.POPUP) {
+      this._updateDetailedFilmCard(isNewComment);
+    }
+  }
+
   _getMovie() {
     const movies = this._moviesModel.get().slice();
     const [movie] = movies.filter((movie) => this._id === movie.id);
     return movie;
   }
 
-  _getComments() {
-    return this._commentsModel.get().slice();
-  }
-
-  _getMovieComments() {
-    const commentsArray = this._getComments();
-    const {comments} = this._getMovie();
-    return commentsArray.filter(({id}) => comments.includes(id));
-  }
-
   _renderDetailedFilmCard(movie, comments) {
+    this._comments = comments;
     this._mode = Mode.POPUP;
-    console.log('4_renderDetailedFilmCard', movie);
     const prevDetailedFilmCardComponent = this._detailedFilmCardComponent;
 
     this._detailedFilmCardComponent = new DetailedFilmCardView(movie, comments);
@@ -85,6 +84,8 @@ export default class Movie {
     this._detailedFilmCardComponent.setWatchedInPopupClickHandler(this._handleWatchedInPopupClick);
     this._detailedFilmCardComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._detailedFilmCardComponent.setCommentDeleteHandler(this._handleDeleteCommentClick);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._moviesModel.addObserver(this._handleModelEvent);
 
     if (prevDetailedFilmCardComponent === null) {
       render(bodyElement, this._detailedFilmCardComponent);
@@ -103,15 +104,57 @@ export default class Movie {
     remove(prevDetailedFilmCardComponent);
   }
 
+  _setViewState(state, payload) {
+    const resetFormState = () => {
+      this._detailedFilmCardComponent.updateData({
+        isDisabled: false,
+        deletingId: null,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._detailedFilmCardComponent.updateData({
+          isDisabled: true,
+        });
+        break;
+      case State.DELETING:
+        this._detailedFilmCardComponent.updateData({
+          isDisabled: true,
+          deletingId: payload,
+        });
+        break;
+      case State.ABORTING:
+        this._detailedFilmCardComponent.shake(resetFormState);
+        break;
+    }
+  }
+
+  setAborting() {
+    if (this._detailedFilmCardComponent) {
+      this._detailedFilmCardComponent.shake(() => {
+        this._detailedFilmCardComponent.updateData({
+          isDisabled: false,
+          deletingId: null,
+        });
+      });
+
+      return;
+    }
+    if (this._filmCardComponent) {
+      this._filmCardComponent.shake();
+    }
+  }
+
   closeDetailedFilmCard() {
     if (this._mode !== Mode.DEFAULT) {
+      this._detailedFilmCardComponent.removeHandlers();
       this._detailedFilmCardComponent.getElement().remove();
       this._detailedFilmCardComponent = null;
       this._mode = Mode.DEFAULT;
+      bodyElement.classList.remove('hide-overflow');
+      document.removeEventListener('keydown', this._documentKeydownHandler);
     }
-
-    bodyElement.classList.remove('hide-overflow');
-    document.removeEventListener('keydown', this._documentKeydownHandler);
   }
 
   _documentKeydownHandler(evt) {
@@ -126,7 +169,13 @@ export default class Movie {
   }
 
   _handleFilmCardClick() {
-    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
+    return this._api.getComments(this._id)
+      .then((response) => {
+        this._renderDetailedFilmCard(this._getMovie(), response);
+      })
+      .catch(() => {
+        this.setAborting();
+      });
   }
 
   _handleAddToWatchlistClick(){
@@ -149,60 +198,69 @@ export default class Movie {
   }
 
   _handleAddToWatchlistInPopupClick() {
+    this._setViewState(State.SAVING);
     this._updateUserDetailsData({
       isWatchlist: !this._getMovie().userDetails.isWatchlist,
     });
-    this._updateDetailedFilmCard({newComment: false});
   }
 
   _handleFavoriteInPopupClick() {
+    this._setViewState(State.SAVING);
     this._updateUserDetailsData({
       isFavorite: !this._getMovie().userDetails.isFavorite,
     });
-    this._updateDetailedFilmCard({newComment: false});
   }
 
   _handleWatchedInPopupClick() {
+    this._setViewState(State.SAVING);
     this._updateUserDetailsData({
       isAlreadyWatched: !this._getMovie().userDetails.isAlreadyWatched,
       watchingDate: !this._getMovie().userDetails.isAlreadyWatched ? dayjs() : '',
     });
-    this._updateDetailedFilmCard({newComment: false});
   }
 
   _handleFormSubmit(comment) {
-    const movieComments = this._getMovie().comments;
+    this._setViewState(State.SAVING);
+    this._api.addComment(comment)
+      .then((response) => {
+        const newComments = response.comments;
 
-    const newComments = [...movieComments.slice(), comment.id];
-    const newMovie = Object.assign(
-      {},
-      this._getMovie(),
-      {
-        comments: newComments,
-      },
-    );
+        const newMovie = Object.assign(
+          {},
+          this._getMovie(),
+          {
+            comments: newComments,
+          },
+        );
 
-    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
-    this._changeData(UserAction.ADD_COMMENT, UpdateType.MINOR, comment);
-
-    this._updateDetailedFilmCard({newComment: true});
+        this._changeData(UserAction.ADD_COMMENT, UpdateType.MINOR, newMovie);
+      })
+      .catch(() => {
+        this._setViewState(State.ABORTING);
+      });
   }
 
-  _handleDeleteCommentClick(comment) {
-    const movieComments = this._getMovie().comments;
-    const filteredComments = movieComments.filter((item) => item !== comment.id);
-    const newMovie = Object.assign(
-      {},
-      this._getMovie(),
-      {
-        comments: filteredComments,
-      },
-    );
+  _handleDeleteCommentClick(commentId) {
+    this._setViewState(State.DELETING, commentId);
+    this._api.deleteComment(commentId)
+      .then(() => {
+        const filteredComments = this._comments
+          .filter((item) => item.id !== String(commentId))
+          .map((comment) => comment.id);
 
-    this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
-    this._changeData(UserAction.DELETE_COMMENT, UpdateType.MINOR, comment);
+        const newMovie = Object.assign(
+          {},
+          this._getMovie(),
+          {
+            comments: filteredComments,
+          },
+        );
 
-    this._updateDetailedFilmCard({newComment: false});
+        this._changeData(UserAction.UPDATE_MOVIE, UpdateType.MINOR, newMovie);
+      })
+      .catch(() => {
+        this._setViewState(State.ABORTING);
+      });
   }
 
   _updateUserDetailsData(data, actionType = UpdateType.MINOR) {
@@ -225,23 +283,29 @@ export default class Movie {
     this._changeData(UserAction.UPDATE_MOVIE, actionType, newMovie);
   }
 
-  _updateScrollPosition(scrollPosition, newComment) {
-    if (newComment && scrollPosition !== 0) {
-      const newCommentScroll = document.querySelector('.film-details__new-comment').scrollHeight;
-      document.querySelector('.film-details').scrollTo(0, scrollPosition + newCommentScroll);
-      return;
-    }
+  _updateScrollPosition(scrollPosition, isNewcomment) {
+    const popup = document.querySelector('.film-details');
+    popup.scrollTo(0, scrollPosition);
 
-    if (scrollPosition !== 0) {
-      document.querySelector('.film-details').scrollTo(0, scrollPosition);
+    if (Object.values(isNewcomment)[0]) {
+      popup.scrollTop = popup.scrollHeight;
     }
   }
 
-  _updateDetailedFilmCard({newComment = false}) {
-    const scrollPosition = document.querySelector('.film-details').scrollTop;
+  _updateDetailedFilmCard(isNewComment) {
+    const scrollPosition = this._getScrollPosition();
     this.closeDetailedFilmCard();
-    this._renderDetailedFilmCard(this._getMovie(), this._getMovieComments());
-    this._updateScrollPosition(scrollPosition, newComment);
+    this._api.getComments(this._id)
+      .then((response) => {
+        this._renderDetailedFilmCard(this._getMovie(), response);
+        this._updateScrollPosition(scrollPosition, isNewComment);
+      });
+  }
+
+  _getScrollPosition() {
+    if (document.querySelector('.film-details')) {
+      return document.querySelector('.film-details').scrollTop;
+    }
   }
 
   destroy() {

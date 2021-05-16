@@ -19,10 +19,9 @@ const FILM_COUNT_PER_STEP = 5;
 const MOST_COMMENTED_TITLE = 'Most commented';
 
 export default class MovieList {
-  constructor(container, moviesModel, commentsModel, filterModel, api) {
+  constructor(container, moviesModel, filterModel, api) {
     this._container = container;
     this._moviesModel = moviesModel;
-    this._commentsModel = commentsModel;
     this._filterModel = filterModel;
 
     this._noMovieComponent = new NoMovieView();
@@ -53,7 +52,6 @@ export default class MovieList {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._moviesModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
-    this._commentsModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -78,20 +76,27 @@ export default class MovieList {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_MOVIE:
-        console.log('1_handleViewAction-update', update);
-        this._api.updateMovie(update).then((response) => {
-          console.log('2_handleViewAction-response', response);
-          this._moviesModel.update(updateType, response);
-        });
-        break;
-      case UserAction.UPDATE_COMMENTS:
-        this._commentsModel.update(updateType, update);
+        this._api.updateMovie(update)
+          .then((response) => {
+            this._moviesModel.update(updateType, response, {isNewComment: false});
+          })
+          .catch(() => {
+            if (this._topRatedFilmCardPresenter[update.id]) {
+              this._topRatedFilmCardPresenter[update.id].setAborting();
+            }
+            if (this._mostCommentedFilmCardPresenter[update.id]) {
+              this._mostCommentedFilmCardPresenter[update.id].setAborting();
+            }
+            if (this._filmCardPresenter[update.id]) {
+              this._filmCardPresenter[update.id].setAborting();
+            }
+          });
         break;
       case UserAction.ADD_COMMENT:
-        this._commentsModel.addComment(updateType, update);
-        break;
-      case UserAction.DELETE_COMMENT:
-        this._commentsModel.deleteComment(updateType, update);
+        this._api.updateMovie(update)
+          .then((response) => {
+            this._moviesModel.update(updateType, response, {isNewComment: true});
+          });
         break;
     }
   }
@@ -140,7 +145,7 @@ export default class MovieList {
   }
 
   _renderMovie(container, id) {
-    const moviePresenter = new MoviePresenter(container, this._handleViewAction, id, this._commentsModel, this._moviesModel);
+    const moviePresenter = new MoviePresenter(container, this._handleViewAction, id, this._moviesModel, this._api);
     moviePresenter.init();
 
     return moviePresenter;

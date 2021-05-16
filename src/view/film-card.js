@@ -16,8 +16,8 @@ const createMovieComments = (comments) => {
 
 const isSelectedFilmControl = (isChecked) => isChecked ? 'film-card__controls-item--active' : '';
 
-const createFilmCardTemplate = (movie, comments) => {
-  const {filmInfo, userDetails} = movie;
+const createFilmCardTemplate = (movie) => {
+  const {filmInfo, userDetails, comments} = movie;
   const {
     description,
     genres,

@@ -44,3 +44,9 @@ export const TimeRange = {
   MONTH: 'month',
   YEAR: 'year',
 };
+
+export const State = {
+  SAVING: 'Saving',
+  DELETING: 'Deleting',
+  ABORTING: 'Aborting',
+};

@@ -1,7 +1,5 @@
 import {bodyElement, mainElement} from './elements.js';
 import {MenuItem, UpdateType} from './const.js';
-
-import {generateComment} from './mock/comment.js';
 import {getRandomNumber} from './utils/common.js';
 
 import Api from './api.js';
@@ -14,34 +12,28 @@ import MovieListPresenter from './presenter/movie-list.js';
 import FooterStatisticPresenter from './presenter/footer-statistic.js';
 
 import MoviesModel from './model/movies.js';
-import CommentsModel from './model/comments.js';
 import FilterModel from './model/filter.js';
 import {remove, render} from './utils/render.js';
 
 const AUTHORIZATION = 'Basic ZXCASDqwe123';
 const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';
 
-const TOTAL_MOVIE_COUNT = 24;
 const MIN_FILM_NUMBER = 100000;
 const MAX_FILM_NUMBER = 150000;
 
 const headerElement = bodyElement.querySelector('.header');
 const footerElement = bodyElement.querySelector('.footer');
 
-const idArray = Array.from(Array(TOTAL_MOVIE_COUNT).keys());
-const comments = idArray.map((id) => generateComment(id));
 const totalMovieCount = getRandomNumber(MIN_FILM_NUMBER, MAX_FILM_NUMBER);
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
 const moviesModel = new MoviesModel();
-const commentsModel = new CommentsModel();
-commentsModel.set(comments);
 const filterModel = new FilterModel();
 
 const profilePresenter = new ProfilePresenter(headerElement, moviesModel);
 const siteMenuPresenter = new SiteMenuPresenter(mainElement, filterModel, moviesModel);
-const movieListPresenter = new MovieListPresenter(mainElement, moviesModel, commentsModel, filterModel, api);
+const movieListPresenter = new MovieListPresenter(mainElement, moviesModel, filterModel, api);
 const footerStatisticPresenter = new FooterStatisticPresenter(footerElement, moviesModel, totalMovieCount);
 
 siteMenuPresenter.init();
