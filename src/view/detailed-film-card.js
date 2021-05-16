@@ -6,9 +6,10 @@ import Smart from '../view/smart.js';
 const DEFAULT_NEW_COMMENT = {
   comment: '',
   emotion: null,
+  date: '',
 };
 
-const createCommentTemplate = (commentData) => {
+const createCommentTemplate = (commentData, isDeleting, isDisabled) => {
   const {
     author,
     comment,
@@ -17,7 +18,7 @@ const createCommentTemplate = (commentData) => {
     id,
   } = commentData;
 
-  const commentDate = dayjs(date).format('YYYY/MM/DD HH:MM');
+  const commentDate = dayjs(date).format('YYYY/MM/DD HH:mm');
 
   return `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
@@ -28,15 +29,15 @@ const createCommentTemplate = (commentData) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
           <span class="film-details__comment-day">${commentDate}</span>
-          <button type='button' class="film-details__comment-delete" data-id="${id}">
-            Delete
+          <button type='button' class="film-details__comment-delete" data-id="${id}"${isDisabled ? ' disabled' : ''}>
+            ${isDeleting ? 'Deleting...' : 'Delete'}
           </button>
         </p>
       </div>
     </li>`;
 };
 
-const isChecked = (isChecked) => isChecked ? 'checked' : '';
+const isChecked = (isChecked) => isChecked ? ' checked' : '';
 
 const createDetailedFilmCardTemplate = (movie, commentsArray) => {
   const {
@@ -44,6 +45,7 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
     filmInfo,
     userDetails,
     isDisabled,
+    deletingId,
     newComment,
   } = movie;
 
@@ -97,7 +99,7 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
     });
 
   const commentFragment = comments.length
-    ? commentsList.map((comment) => createCommentTemplate(comment)).join('')
+    ? commentsList.map((comment) => createCommentTemplate(comment, comment.id === String(deletingId), isDisabled)).join('')
     : '';
 
   const {emotion, comment} = newComment;
@@ -112,7 +114,7 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
           <div class="film-details__poster">
             <img class="film-details__poster-img" src="./${poster}" alt="">
 
-            <p class="film-details__age">${ageRating}</p>
+            <p class="film-details__age">${ageRating}+</p>
           </div>
 
           <div class="film-details__info">
@@ -167,13 +169,13 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
         </div>
 
         <section class="film-details__controls">
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${watchlistChecked}>
+          <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist" ${watchlistChecked}${isDisabled ? ' disabled' : ''}>
           <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
 
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${alreadyWatchedChecked}>
+          <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" ${alreadyWatchedChecked}${isDisabled ? ' disabled' : ''}>
           <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
 
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${favoriteChecked}>
+          <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite" ${favoriteChecked}${isDisabled ? ' disabled' : ''}>
           <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
         </section>
       </div>
@@ -235,7 +237,7 @@ export default class DetailedFilmCard extends Smart {
     this._favoriteInPopupClickHandler = this._favoriteInPopupClickHandler.bind(this);
     this._watchedInPopupClickHandler = this._watchedInPopupClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
-    this._documentKeyDownHandler = this._documentKeyDownHandler.bind(this);
+    this._documentEnterKeyDownHandler = this._documentEnterKeyDownHandler.bind(this);
     this._changeCommentEmojiHandler = this._changeCommentEmojiHandler.bind(this);
     this._inputNewCommentHandler = this._inputNewCommentHandler.bind(this);
     this._deleteCommentHandler = this._deleteCommentHandler.bind(this);
@@ -247,50 +249,24 @@ export default class DetailedFilmCard extends Smart {
     return Object.assign({}, film, {
       newComment: DEFAULT_NEW_COMMENT,
       isDisabled: false,
+      deletingId: null,
     });
   }
 
   static parseDataToComment(data) {
+    data = Object.assign({}, data);
+    delete data.isDisabled;
+    delete data.deletingId;
+
     return {
       comment: data.newComment.comment,
       emotion: data.newComment.emotion,
-      date: dayjs().toDate(),
-      id: Date.now(),
+      filmId: data.id,
     };
   }
 
   getTemplate() {
     return createDetailedFilmCardTemplate(this._data, this._comments);
-  }
-
-  updateData(update, justDataUpdating) {
-    if (!update) {
-      return;
-    }
-
-    this._data = Object.assign(
-      {},
-      this._data,
-      update,
-    );
-
-    if (justDataUpdating) {
-      return;
-    }
-
-    this.updateElement();
-  }
-
-  updateElement() {
-    const prevElement = this.getElement();
-    const parent = prevElement.parentElement;
-    this.removeElement();
-
-    const newElement = this.getElement();
-
-    parent.replaceChild(newElement, prevElement);
-
-    this.restoreHandlers();
   }
 
   _closeBtnClickHandler(evt) {
@@ -335,7 +311,7 @@ export default class DetailedFilmCard extends Smart {
     this._callback.formSubmit(update);
   }
 
-  _documentKeyDownHandler(evt) {
+  _documentEnterKeyDownHandler(evt) {
     if (evt.key === 'Enter' && (evt.metaKey || evt.ctrlKey)) {
       evt.preventDefault();
       this._formSubmitHandler();
@@ -375,8 +351,7 @@ export default class DetailedFilmCard extends Smart {
   _deleteCommentHandler(evt) {
     evt.preventDefault();
     const deletedCommentId = +evt.target.dataset.id;
-    const [deletedComment] = this._comments.filter(({id}) => id === deletedCommentId);
-    this._callback.deleteComment(deletedComment);
+    this._callback.deleteComment(deletedCommentId);
   }
 
   setCommentDeleteHandler(callback) {
@@ -388,27 +363,35 @@ export default class DetailedFilmCard extends Smart {
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
-    document.addEventListener('keydown', this._documentKeyDownHandler);
+    document.addEventListener('keydown', this._documentEnterKeyDownHandler);
   }
 
   setCloseBtnClickHandler(callback) {
     this._callback.closeBtnClick = callback;
-    this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._closeBtnClickHandler);
+    this.getElement()
+      .querySelector('.film-details__close-btn')
+      .addEventListener('click', this._closeBtnClickHandler);
   }
 
   setFavoriteInPopupClickHandler(callback) {
     this._callback.favoriteInPopupClick = callback;
-    this.getElement().querySelector('#favorite').addEventListener('click', this._favoriteInPopupClickHandler);
+    this.getElement()
+      .querySelector('#favorite')
+      .addEventListener('click', this._favoriteInPopupClickHandler);
   }
 
   setAddToWatchlistInPopupClickHandler(callback) {
     this._callback.addToWatchlistInPopupClick = callback;
-    this.getElement().querySelector('#watchlist').addEventListener('click', this._addToWatchlistInPopupClickHandler);
+    this.getElement()
+      .querySelector('#watchlist')
+      .addEventListener('click', this._addToWatchlistInPopupClickHandler);
   }
 
   setWatchedInPopupClickHandler(callback) {
     this._callback.watchedInPopupClick = callback;
-    this.getElement().querySelector('#watched').addEventListener('click', this._watchedInPopupClickHandler);
+    this.getElement()
+      .querySelector('#watched')
+      .addEventListener('click', this._watchedInPopupClickHandler);
   }
 
   restoreHandlers() {
@@ -430,5 +413,9 @@ export default class DetailedFilmCard extends Smart {
     this.getElement()
       .querySelector('.film-details__comment-input')
       .addEventListener('input', this._inputNewCommentHandler);
+  }
+
+  removeHandlers() {
+    document.removeEventListener('keydown', this._documentEnterKeyDownHandler);
   }
 }

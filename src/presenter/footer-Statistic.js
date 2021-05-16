@@ -2,10 +2,10 @@ import FooterStatisticView from '../view/footer-statistic.js';
 import {remove, render, replace}  from '../utils/render.js';
 
 export default class FooterStatistic {
-  constructor(container, moviesModel, generalCount) {
+  constructor(container, moviesModel, totalMoviesCount) {
     this._container = container;
     this._moviesModel = moviesModel;
-    this._generalCount = generalCount;
+    this._totalMoviesCount = totalMoviesCount;
 
     this._footerStatisticComponent = null;
 
@@ -26,12 +26,12 @@ export default class FooterStatistic {
   }
 
   _renderFooterStatistic() {
-    if (this._getMovies().length === 0) {
-      this._generalCount = 0;
+    if (!this._getMovies().length) {
+      this._totalMoviesCount = 0;
     }
 
     const prevFooterStatisticComponent = this._footerStatisticComponent;
-    this._footerStatisticComponent = new FooterStatisticView(this._generalCount);
+    this._footerStatisticComponent = new FooterStatisticView(this._totalMoviesCount);
 
     if (prevFooterStatisticComponent === null) {
       return render(this._container, this._footerStatisticComponent);

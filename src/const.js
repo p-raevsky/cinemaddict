@@ -23,6 +23,7 @@ export const UpdateType = {
   PATCH: 'Patch',
   MINOR: 'Minor',
   MAJOR: 'Major',
+  INIT: 'Init',
 };
 
 export const Rank = {
@@ -36,25 +37,16 @@ export const Mode = {
   POPUP: 'Popup',
 };
 
-export const Genre = {
-  ANIME: 'Anime',
-  FANTASY: 'Fantasy',
-  SCI_FI: 'Sci-Fi',
-  WESTERN: 'Western',
-  MISTERY: 'Mystery',
-  COMEDY: 'Comedy',
-  EPIC: 'Epic',
-  ACTION: 'Action',
-  HORROR: 'Horror',
-  DRAMA: 'Drama',
-};
-
-export const GENRES = Object.values(Genre);
-
 export const TimeRange = {
   ALL_TIME: 'all-time',
   DAY: 'day',
   WEEK: 'week',
   MONTH: 'month',
   YEAR: 'year',
+};
+
+export const State = {
+  SAVING: 'Saving',
+  DELETING: 'Deleting',
+  ABORTING: 'Aborting',
 };
