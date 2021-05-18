@@ -8,6 +8,7 @@ export const filterWatchedMoviesInRange = ({movies, range}) => {
 
   return movies.filter((movie) => {
     const dateNow = dayjs();
+
     return dayjs(movie.userDetails.watchingDate).isSame(dateNow, range);
   });
 };

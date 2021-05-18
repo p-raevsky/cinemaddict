@@ -4,6 +4,7 @@ export default class Movies extends Observer {
   constructor() {
     super();
     this._movies = [];
+    this._mode = null;
   }
 
   set(updateType, movies) {
@@ -14,6 +15,14 @@ export default class Movies extends Observer {
 
   get() {
     return this._movies;
+  }
+
+  setMode(mode) {
+    this._mode = mode;
+  }
+
+  getMode() {
+    return this._mode;
   }
 
   update(updateType, update, isNewcomment) {

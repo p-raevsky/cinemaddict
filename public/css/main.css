@@ -69,8 +69,7 @@ body {
 }
 
 .hide-overflow {
-  position: fixed;
-  overflow-y: scroll;
+  overflow: hidden;
 }
 
 a:link {

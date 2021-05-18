@@ -17,10 +17,6 @@ export default class Profile {
     this._renderProfile();
   }
 
-  _handleModelEvent() {
-    this.init();
-  }
-
   _getMovies() {
     return this._moviesModel.get().slice();
   }
@@ -38,14 +34,16 @@ export default class Profile {
     }
 
     if (prevProfileComponent === null) {
-      return render(this._container, this._profileComponent);
+      render(this._container, this._profileComponent);
+
+      return;
     }
 
     replace(this._profileComponent, prevProfileComponent);
     remove(prevProfileComponent);
   }
 
-  destroy() {
-    remove(this._profileComponent);
+  _handleModelEvent() {
+    this.init();
   }
 }

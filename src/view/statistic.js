@@ -7,13 +7,24 @@ import {getRankName} from '../utils/rank.js';
 import {TimeRange} from '../const.js';
 
 const BAR_HEIGHT = 50;
+const MIN_IN_ONE_HOUR = 60;
+const BG_COLOR = '#ffe800';
+const COLOR = '#ffffff';
+const TYPE = 'horizontalBar';
+const ANCHOR = 'start';
+const ALIGN = 'start';
+const SIZE =  20;
+const OFFSET = 40;
+const PADDING = 100;
+const FONT_SIZE = 20;
+const BAR_THICKNESS = 24;
 
 const createCountMoviesByGenre = (movies) => {
   const watchedMovies = movies.filter((movie) => movie.userDetails.isAlreadyWatched);
-  const moviesGenresArray = watchedMovies
+  const moviesGenres = watchedMovies
     .map((movie) => movie.filmInfo.genres)
     .flat(1);
-  const uniqGenres = makeItemsUniq(moviesGenresArray);
+  const uniqGenres = makeItemsUniq(moviesGenres);
   const movieByGenreCounts = uniqGenres.map((genre) => {
     return {
       genre,
@@ -29,8 +40,8 @@ const getTopGenre = (movies) => {
     return '';
   }
 
-  const countMoviesByGenreArray = createCountMoviesByGenre(movies);
-  return countMoviesByGenreArray.length ? countMoviesByGenreArray[0].genre : '';
+  const countMoviesByGenre = createCountMoviesByGenre(movies);
+  return countMoviesByGenre.length ? countMoviesByGenre[0].genre : '';
 };
 
 const renderChart = (statisticCtx, movies) => {
@@ -41,40 +52,40 @@ const renderChart = (statisticCtx, movies) => {
 
   return new Chart(statisticCtx, {
     plugins: [ChartDataLabels],
-    type: 'horizontalBar',
+    type: TYPE,
     data: {
       labels: genres,
       datasets: [{
         data: counts,
-        backgroundColor: '#ffe800',
-        hoverBackgroundColor: '#ffe800',
-        anchor: 'start',
+        backgroundColor: BG_COLOR,
+        hoverBackgroundColor: BG_COLOR,
+        anchor: ANCHOR,
       }],
     },
     options: {
       plugins: {
         datalabels: {
           font: {
-            size: 20,
+            size: SIZE,
           },
-          color: '#ffffff',
-          anchor: 'start',
-          align: 'start',
-          offset: 40,
+          color: COLOR,
+          anchor: ANCHOR,
+          align: ALIGN,
+          offset: OFFSET,
         },
       },
       scales: {
         yAxes: [{
           ticks: {
-            fontColor: '#ffffff',
-            padding: 100,
-            fontSize: 20,
+            fontColor: COLOR,
+            padding: PADDING,
+            fontSize: FONT_SIZE,
           },
           gridLines: {
             display: false,
             drawBorder: false,
           },
-          barThickness: 24,
+          barThickness: BAR_THICKNESS,
         }],
         xAxes: [{
           ticks: {
@@ -115,18 +126,18 @@ const parseWatchedTime = (timeInMin) => {
     };
   }
 
-  if (timeInMin < 60) {
+  if (timeInMin < MIN_IN_ONE_HOUR) {
     return {
       h: 0,
       m: timeInMin,
     };
   }
 
-  const h = parseInt(timeInMin / 60);
+  const h = parseInt(timeInMin / MIN_IN_ONE_HOUR);
 
   return {
     h,
-    m: timeInMin - (h * 60),
+    m: timeInMin - (h * MIN_IN_ONE_HOUR),
   };
 };
 
@@ -218,9 +229,13 @@ export default class Statistic extends SmartView {
     return filterWatchedMoviesInRange(this._data);
   }
 
-  restoreHandlers() {
-    this._setCharts();
-    this._setStatisticFilterChangeHandler();
+  _setCharts() {
+    if(this._chart !== null) {
+      this._chart = null;
+    }
+
+    const statisticCtx = this.getElement().querySelector('.statistic__chart');
+    this._chart = renderChart(statisticCtx, this._getWatchedMovies());
   }
 
   removeElement() {
@@ -231,6 +246,10 @@ export default class Statistic extends SmartView {
     }
   }
 
+  restoreHandlers() {
+    this._setCharts();
+    this._setStatisticFilterChangeHandler();
+  }
 
   _statisticFilterClickHandler(evt) {
     evt.preventDefault();
@@ -245,14 +264,5 @@ export default class Statistic extends SmartView {
     this.getElement()
       .querySelector('.statistic__filters')
       .addEventListener('change', this._statisticFilterClickHandler);
-  }
-
-  _setCharts() {
-    if(this._chart !== null) {
-      this._chart = null;
-    }
-
-    const statisticCtx = this.getElement().querySelector('.statistic__chart');
-    this._chart = renderChart(statisticCtx, this._getWatchedMovies());
   }
 }

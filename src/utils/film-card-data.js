@@ -1,10 +1,6 @@
 import dayjs from 'dayjs';
-import {getRandomNumber} from './common.js';
 
-export const generateDate = (days) => {
-  const daysGap = -getRandomNumber(1, days);
-  return dayjs().add(daysGap, 'day');
-};
+const MINUTES_IN_ONE_HOUR = 60;
 
 export const sortMovieByDate = (movieA, movieB) => {
   const dateA = dayjs(movieA.filmInfo.release.date);
@@ -16,11 +12,11 @@ export const sortMovieByDate = (movieA, movieB) => {
 export const sortMovieByRating = (movieA, movieB) => movieB.filmInfo.totalRating - movieA.filmInfo.totalRating;
 
 export const generateRuntime = (time) => {
-  if (time < 60) {
+  if (time < MINUTES_IN_ONE_HOUR) {
     return `${time}m`;
   }
 
-  const h = parseInt(time / 60);
+  const h = parseInt(time / MINUTES_IN_ONE_HOUR);
 
-  return `${h}h ${time - (h * 60)}m`;
+  return `${h}h ${time - (h * MINUTES_IN_ONE_HOUR)}m`;
 };
