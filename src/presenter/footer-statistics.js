@@ -1,7 +1,7 @@
 import FooterStatisticView from '../view/footer-statistic.js';
 import {remove, render, replace}  from '../utils/render.js';
 
-export default class FooterStatistic {
+export default class FooterStatistics {
   constructor(container, moviesModel) {
     this._container = container;
     this._moviesModel = moviesModel;

@@ -8,7 +8,7 @@ import StatisticView from './view/statistic.js';
 import ProfilePresenter from './presenter/profile.js';
 import SiteMenuPresenter from './presenter/site-menu.js';
 import MovieListPresenter from './presenter/movie-list.js';
-import FooterStatisticPresenter from './presenter/footer-statistic.js';
+import FooterStatisticsPresenter from './presenter/footer-statistics.js';
 
 import MoviesModel from './model/movies.js';
 import FilterModel from './model/filter.js';
@@ -28,7 +28,7 @@ const filterModel = new FilterModel();
 const profilePresenter = new ProfilePresenter(headerElement, moviesModel);
 const siteMenuPresenter = new SiteMenuPresenter(mainElement, filterModel, moviesModel);
 const movieListPresenter = new MovieListPresenter(mainElement, moviesModel, filterModel, api);
-const footerStatisticPresenter = new FooterStatisticPresenter(footerElement, moviesModel);
+const footerStatisticsPresenter = new FooterStatisticsPresenter(footerElement, moviesModel);
 
 siteMenuPresenter.init();
 movieListPresenter.init();
@@ -39,7 +39,7 @@ api.getMovies()
   .then((movies) => {
     moviesModel.set(UpdateType.INIT, movies);
     profilePresenter.init();
-    footerStatisticPresenter.init();
+    footerStatisticsPresenter.init();
 
     const mainNavigation = document.querySelector('.main-navigation');
     mainNavigation.addEventListener('click', (evt) => {
@@ -53,7 +53,7 @@ api.getMovies()
   .catch(() => {
     moviesModel.set(UpdateType.INIT, []);
     profilePresenter.init();
-    footerStatisticPresenter.init();
+    footerStatisticsPresenter.init();
 
     const mainNavigation = document.querySelector('.main-navigation');
     mainNavigation.addEventListener('click', (evt) => {
