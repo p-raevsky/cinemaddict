@@ -33,7 +33,6 @@ export default class FooterStatistic {
 
     if (prevFooterStatisticComponent === null) {
       render(this._container, this._footerStatisticComponent);
-
       return;
     }
 
