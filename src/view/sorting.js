@@ -3,6 +3,7 @@ import {SortType} from '../const.js';
 
 const createSortingTemplate = (sortType) => {
   const activeClass = 'sort__button--active';
+
   return `<ul class="sort">
     <li><a href="#" class="sort__button ${sortType === SortType.DEFAULT ? activeClass : ''}" data-sort-type="${SortType.DEFAULT}">Sort by default</a></li>
     <li><a href="#" class="sort__button ${sortType === SortType.DATE ? activeClass : ''}" data-sort-type="${SortType.DATE}">Sort by date</a></li>

@@ -39,7 +39,7 @@ const createCommentTemplate = (commentData, isDeleting, isDisabled) => {
 
 const isChecked = (isChecked) => isChecked ? ' checked' : '';
 
-const createDetailedFilmCardTemplate = (movie, commentsArray) => {
+const createDetailedFilmCardTemplate = (movie, movieComments) => {
   const {
     comments,
     filmInfo,
@@ -88,9 +88,9 @@ const createDetailedFilmCardTemplate = (movie, commentsArray) => {
   const alreadyWatchedChecked = isChecked(isAlreadyWatched);
   const favoriteChecked = isChecked(isFavorite);
 
-  const commentsCount = !commentsArray.length ? '0' : commentsArray.length;
+  const commentsCount = !movieComments.length ? '0' : movieComments.length;
 
-  const commentsList = commentsArray
+  const commentsList = movieComments
     .sort((a, b) => {
       const date1 = dayjs(a.date);
       const date2 = dayjs(b.date);
@@ -231,7 +231,6 @@ export default class DetailedFilmCard extends Smart {
     this._data = DetailedFilmCard.parseFilmToData(film);
     this._comments = comments;
     this._updatedComments = null;
-    this._scrollPosition = null;
     this._closeBtnClickHandler = this._closeBtnClickHandler.bind(this);
     this._addToWatchlistInPopupClickHandler = this._addToWatchlistInPopupClickHandler.bind(this);
     this._favoriteInPopupClickHandler = this._favoriteInPopupClickHandler.bind(this);
@@ -243,26 +242,6 @@ export default class DetailedFilmCard extends Smart {
     this._deleteCommentHandler = this._deleteCommentHandler.bind(this);
 
     this._setInnerHandlers();
-  }
-
-  static parseFilmToData(film) {
-    return Object.assign({}, film, {
-      newComment: DEFAULT_NEW_COMMENT,
-      isDisabled: false,
-      deletingId: null,
-    });
-  }
-
-  static parseDataToComment(data) {
-    data = Object.assign({}, data);
-    delete data.isDisabled;
-    delete data.deletingId;
-
-    return {
-      comment: data.newComment.comment,
-      emotion: data.newComment.emotion,
-      filmId: data.id,
-    };
   }
 
   getTemplate() {
@@ -295,6 +274,7 @@ export default class DetailedFilmCard extends Smart {
     }
 
     const {comment, emotion} = this._data.newComment;
+
     if (!comment.trim() || !emotion) {
       return;
     }
@@ -320,8 +300,6 @@ export default class DetailedFilmCard extends Smart {
 
   _changeCommentEmojiHandler(evt) {
     evt.preventDefault();
-    const scrollPosition = document.querySelector('.film-details').scrollTop;
-
     this.updateData({
       newComment: Object.assign(
         {},
@@ -331,8 +309,6 @@ export default class DetailedFilmCard extends Smart {
         },
       ),
     });
-
-    document.querySelector('.film-details').scrollTo(0, scrollPosition);
   }
 
   _inputNewCommentHandler(evt) {
@@ -352,6 +328,16 @@ export default class DetailedFilmCard extends Smart {
     evt.preventDefault();
     const deletedCommentId = +evt.target.dataset.id;
     this._callback.deleteComment(deletedCommentId);
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelectorAll('.film-details__emoji-item')
+      .forEach((item) => item.addEventListener('change', this._changeCommentEmojiHandler));
+
+    this.getElement()
+      .querySelector('.film-details__comment-input')
+      .addEventListener('input', this._inputNewCommentHandler);
   }
 
   setCommentDeleteHandler(callback) {
@@ -405,17 +391,27 @@ export default class DetailedFilmCard extends Smart {
     this.setCommentDeleteHandler(this._callback.deleteComment);
   }
 
-  _setInnerHandlers() {
-    this.getElement()
-      .querySelectorAll('.film-details__emoji-item')
-      .forEach((item) => item.addEventListener('change', this._changeCommentEmojiHandler));
-
-    this.getElement()
-      .querySelector('.film-details__comment-input')
-      .addEventListener('input', this._inputNewCommentHandler);
-  }
-
   removeHandlers() {
     document.removeEventListener('keydown', this._documentEnterKeyDownHandler);
+  }
+
+  static parseFilmToData(film) {
+    return Object.assign({}, film, {
+      newComment: DEFAULT_NEW_COMMENT,
+      isDisabled: false,
+      deletingId: null,
+    });
+  }
+
+  static parseDataToComment(data) {
+    data = Object.assign({}, data);
+    delete data.isDisabled;
+    delete data.deletingId;
+
+    return {
+      comment: data.newComment.comment,
+      emotion: data.newComment.emotion,
+      filmId: data.id,
+    };
   }
 }
