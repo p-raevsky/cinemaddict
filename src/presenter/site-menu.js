@@ -21,8 +21,6 @@ export default class SiteMenu {
   init() {
     this._renderSiteMenu();
     this._renderFilters();
-
-    document.querySelector('.main-navigation').addEventListener('click', this._handleSiteMenuClick);
   }
 
   _getFilters() {
@@ -51,22 +49,20 @@ export default class SiteMenu {
     ];
   }
 
+  getMainNavigationContainer() {
+    return this._siteMenuComponent.getElement();
+  }
+
   toggleMenuItem(menuItem) {
     switch (menuItem) {
       case MenuItem.STATISTICS:
-        this._siteMenuComponent
-          .getElement()
-          .querySelector('.main-navigation__additional')
-          .classList.add('main-navigation__additional--active');
+        this._siteMenuComponent.addActiveBtnState();
         break;
       case MenuItem.ALL_MOVIES:
       case MenuItem.FAVOURITES:
       case MenuItem.HISTORY:
       case MenuItem.WATHCLIST:
-        this._siteMenuComponent
-          .getElement()
-          .querySelector('.main-navigation__additional')
-          .classList.remove('main-navigation__additional--active');
+        this._siteMenuComponent.removeActiveBtnState();
         break;
     }
   }

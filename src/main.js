@@ -41,29 +41,25 @@ api.getMovies()
     profilePresenter.init();
     footerStatisticsPresenter.init();
 
-    const mainNavigation = document.querySelector('.main-navigation');
-    mainNavigation.addEventListener('click', (evt) => {
-      if (evt.target.closest('a')) {
-        evt.preventDefault();
-        const menuItemType = evt.target.dataset.type;
-        handleMenuItemClick(menuItemType);
-      }
-    });
+    siteMenuPresenter.getMainNavigationContainer()
+      .addEventListener('click', siteMenuClickHandler);
   })
   .catch(() => {
     moviesModel.set(UpdateType.INIT, []);
     profilePresenter.init();
     footerStatisticsPresenter.init();
 
-    const mainNavigation = document.querySelector('.main-navigation');
-    mainNavigation.addEventListener('click', (evt) => {
-      if (evt.target.closest('a')) {
-        evt.preventDefault();
-        const menuItemType = evt.target.dataset.type;
-        handleMenuItemClick(menuItemType);
-      }
-    });
+    siteMenuPresenter.getMainNavigationContainer()
+      .addEventListener('click', siteMenuClickHandler);
   });
+
+const siteMenuClickHandler = (evt) => {
+  if (evt.target.closest('a')) {
+    evt.preventDefault();
+    const menuItemType = evt.target.dataset.type;
+    handleMenuItemClick(menuItemType);
+  }
+};
 
 const handleMenuItemClick = (menuItem) => {
   switch (menuItem) {

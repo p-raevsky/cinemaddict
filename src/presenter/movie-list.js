@@ -116,7 +116,7 @@ export default class MovieList {
     this._showMoreButtonComponent = new ShowMoreButtonView();
     render(this._filmsListComponent, this._showMoreButtonComponent);
 
-    this._showMoreButtonComponent.setClickHandler(this._handleShowMoreButtonClick);
+    this._showMoreButtonComponent.setShowMoreButtonClicHandler(this._handleShowMoreButtonClick);
   }
 
   _renderTopRatedList() {
@@ -128,7 +128,7 @@ export default class MovieList {
     }
 
     render(this._filmsContainerComponent, this._extraFilmsListComponent);
-    this._topRatedListContainer = this._extraFilmsListComponent.getElement().querySelector('.films-list--extra .films-list__container');
+    this._topRatedListContainer = this._extraFilmsListComponent.getFilmsListContainer();
 
     moviesWithRating
       .filter((movie) => movie.filmInfo.totalRating)
@@ -151,7 +151,7 @@ export default class MovieList {
     this._extraMostCommentedFilmsListComponent = new ExtraFilmsListView(MOST_COMMENTED_TITLE);
     render(this._filmsContainerComponent, this._extraMostCommentedFilmsListComponent);
 
-    this._mostCommentedContainer = this._extraMostCommentedFilmsListComponent.getElement().querySelector('.films-list--extra .films-list__container');
+    this._mostCommentedContainer = this._extraMostCommentedFilmsListComponent.getFilmsListContainer();
 
     moviesWithComments
       .sort((a, b) => b.comments.length - a.comments.length)
@@ -185,7 +185,8 @@ export default class MovieList {
     render(mainElement, this._filmsContainerComponent);
     render(this._filmsContainerComponent, this._filmsListComponent);
 
-    this._filmsListContainer = document.querySelector('.films-list__container');
+    this._filmsListContainer = this._filmsListComponent.getFilmsListContainer();
+
     this._renderRegularMovieList();
     this._renderTopRatedList();
     this._renderMostCommentedList();
