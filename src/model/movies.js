@@ -112,8 +112,8 @@ export default class Movies extends Observer {
       {},
       movie,
       {
-        film_info: movie.filmInfo,
-        user_details: movie.userDetails,
+        'film_info': movie.filmInfo,
+        'user_details': movie.userDetails,
       },
     );
 
@@ -121,10 +121,10 @@ export default class Movies extends Observer {
       {},
       softAdaptedMovie.user_details,
       {
-        already_watched: movie.userDetails.isAlreadyWatched,
-        favorite: movie.userDetails.isFavorite,
-        watchlist: movie.userDetails.isWatchlist,
-        watching_date: movie.userDetails.watchingDate ? movie.userDetails.watchingDate.toISOString() : null,
+        'already_watched': movie.userDetails.isAlreadyWatched,
+        'favorite': movie.userDetails.isFavorite,
+        'watchlist': movie.userDetails.isWatchlist,
+        'watching_date': movie.userDetails.watchingDate ? movie.userDetails.watchingDate.toISOString() : null,
       },
     );
 
@@ -132,8 +132,8 @@ export default class Movies extends Observer {
       {},
       softAdaptedMovie.film_info.release,
       {
-        release_country: movie.filmInfo.release.releaseCountry,
-        date: movie.filmInfo.release.date ? movie.filmInfo.release.date.toISOString() : null,
+        'release_country': movie.filmInfo.release.releaseCountry,
+        'date': movie.filmInfo.release.date ? movie.filmInfo.release.date.toISOString() : null,
       },
     );
 
@@ -141,11 +141,11 @@ export default class Movies extends Observer {
       {},
       softAdaptedMovie.film_info,
       {
-        age_rating: movie.filmInfo.ageRating,
-        alternative_title: movie.filmInfo.alternativeTitle,
-        genre: movie.filmInfo.genres,
-        total_rating: movie.filmInfo.totalRating,
-        release: newRelease,
+        'age_rating': movie.filmInfo.ageRating,
+        'alternative_title': movie.filmInfo.alternativeTitle,
+        'genre': movie.filmInfo.genres,
+        'total_rating': movie.filmInfo.totalRating,
+        'release': newRelease,
       },
     );
 
@@ -153,8 +153,8 @@ export default class Movies extends Observer {
       {},
       softAdaptedMovie,
       {
-        user_details: newUserDetails,
-        film_info: newFilmInfo,
+        'user_details': newUserDetails,
+        'film_info': newFilmInfo,
       },
     );
 
