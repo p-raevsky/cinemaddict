@@ -237,15 +237,34 @@ export default class DetailedFilmCard extends Smart {
     this._watchedInPopupClickHandler = this._watchedInPopupClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._documentEnterKeyDownHandler = this._documentEnterKeyDownHandler.bind(this);
-    this._changeCommentEmojiHandler = this._changeCommentEmojiHandler.bind(this);
-    this._inputNewCommentHandler = this._inputNewCommentHandler.bind(this);
-    this._deleteCommentHandler = this._deleteCommentHandler.bind(this);
+    this._сommentEmojiСhangeHandler = this._сommentEmojiСhangeHandler.bind(this);
+    this._сommentInputHandler = this._сommentInputHandler.bind(this);
+    this._deleteCommentButtonClickHandler = this._deleteCommentButtonClickHandler.bind(this);
 
     this._setInnerHandlers();
   }
 
   getTemplate() {
     return createDetailedFilmCardTemplate(this._data, this._comments);
+  }
+
+  updateNewCommentImput(newComment) {
+    const {comment, emotion} = newComment;
+
+    if (!emotion && !comment) {
+      return;
+    }
+
+    this.updateData({
+      newComment: Object.assign(
+        {},
+        this._data.newComment,
+        {
+          comment,
+          emotion,
+        },
+      ),
+    });
   }
 
   _closeBtnClickHandler(evt) {
@@ -255,17 +274,23 @@ export default class DetailedFilmCard extends Smart {
 
   _favoriteInPopupClickHandler(evt) {
     evt.preventDefault();
-    this._callback.favoriteInPopupClick();
+    const {comment, emotion} = this._data.newComment;
+
+    this._callback.favoriteInPopupClick(comment, emotion);
   }
 
   _addToWatchlistInPopupClickHandler(evt) {
     evt.preventDefault();
-    this._callback.addToWatchlistInPopupClick();
+    const {comment, emotion} = this._data.newComment;
+
+    this._callback.addToWatchlistInPopupClick(comment, emotion);
   }
 
   _watchedInPopupClickHandler(evt) {
     evt.preventDefault();
-    this._callback.watchedInPopupClick();
+    const {comment, emotion} = this._data.newComment;
+
+    this._callback.watchedInPopupClick(comment, emotion);
   }
 
   _formSubmitHandler() {
@@ -298,7 +323,7 @@ export default class DetailedFilmCard extends Smart {
     }
   }
 
-  _changeCommentEmojiHandler(evt) {
+  _сommentEmojiСhangeHandler(evt) {
     evt.preventDefault();
     this.updateData({
       newComment: Object.assign(
@@ -311,7 +336,7 @@ export default class DetailedFilmCard extends Smart {
     });
   }
 
-  _inputNewCommentHandler(evt) {
+  _сommentInputHandler(evt) {
     evt.preventDefault();
     this.updateData({
       newComment: Object.assign(
@@ -324,27 +349,29 @@ export default class DetailedFilmCard extends Smart {
     }, true);
   }
 
-  _deleteCommentHandler(evt) {
+  _deleteCommentButtonClickHandler(evt) {
     evt.preventDefault();
+    const {comment, emotion} = this._data.newComment;
     const deletedCommentId = +evt.target.dataset.id;
-    this._callback.deleteComment(deletedCommentId);
+
+    this._callback.deleteCommentBtnClick(comment, emotion, deletedCommentId);
   }
 
   _setInnerHandlers() {
     this.getElement()
       .querySelectorAll('.film-details__emoji-item')
-      .forEach((item) => item.addEventListener('change', this._changeCommentEmojiHandler));
+      .forEach((item) => item.addEventListener('change', this._сommentEmojiСhangeHandler));
 
     this.getElement()
       .querySelector('.film-details__comment-input')
-      .addEventListener('input', this._inputNewCommentHandler);
+      .addEventListener('input', this._сommentInputHandler);
   }
 
-  setCommentDeleteHandler(callback) {
-    this._callback.deleteComment = callback;
+  setDeleteCommentButtonClickHandler(callback) {
+    this._callback.deleteCommentBtnClick = callback;
     this.getElement()
       .querySelectorAll('.film-details__comment-delete')
-      .forEach((item) => item.addEventListener('click', this._deleteCommentHandler));
+      .forEach((item) => item.addEventListener('click', this._deleteCommentButtonClickHandler));
   }
 
   setFormSubmitHandler(callback) {
@@ -388,7 +415,7 @@ export default class DetailedFilmCard extends Smart {
     this.setWatchedInPopupClickHandler(this._callback.watchedInPopupClick);
     this.setCloseBtnClickHandler(this._callback.closeBtnClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setCommentDeleteHandler(this._callback.deleteComment);
+    this.setDeleteCommentButtonClickHandler(this._callback.deleteCommentBtnClick);
   }
 
   removeHandlers() {

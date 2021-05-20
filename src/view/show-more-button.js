@@ -8,21 +8,21 @@ const createShowMoreButtonTemplate = () => {
 export default class ShowMoreButton extends AbstractView {
   constructor() {
     super();
-    this._clickHandler = this._clickHandler.bind(this);
+    this._showMoreButtonClickHandler = this._showMoreButtonClickHandler.bind(this);
   }
 
   getTemplate() {
     return createShowMoreButtonTemplate();
   }
 
-  _clickHandler(evt) {
+  _showMoreButtonClickHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.showMoreBtnClick();
   }
 
-  setClickHandler(callback) {
-    this._callback.click = callback;
+  setShowMoreButtonClicHandler(callback) {
+    this._callback.showMoreBtnClick = callback;
     this.getElement()
-      .addEventListener('click', this._clickHandler);
+      .addEventListener('click', this._showMoreButtonClickHandler);
   }
 }

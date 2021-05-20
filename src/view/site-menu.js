@@ -20,4 +20,16 @@ export default class SiteMenu extends AbstractView {
   getTemplate() {
     return createSiteMenuTemplate(this._currentMenuItemType);
   }
+
+  addActiveBtnState() {
+    this.getElement()
+      .querySelector('.main-navigation__additional')
+      .classList.add('main-navigation__additional--active');
+  }
+
+  removeActiveBtnState() {
+    this.getElement()
+      .querySelector('.main-navigation__additional')
+      .classList.remove('main-navigation__additional--active');
+  }
 }
